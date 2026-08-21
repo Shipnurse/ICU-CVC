@@ -1,15 +1,21 @@
 {
-  "name": "ICU CVC",
-  "short_name": "ICU CVC",
-  "description": "Strumento di supporto decisionale per la compatibilità dei farmaci in CVC.",
-  "start_url": "./",
-  "scope": "./",
+  "name": "Supporto Infusionale CVC",
+  "short_name": "ICU-CVC",
+  "start_url": "./index.html",
   "display": "standalone",
-  "orientation": "portrait",
   "background_color": "#f8fafc",
   "theme_color": "#0f766e",
+  "orientation": "portrait",
   "icons": [
-    {"src":"./icon-192.png","sizes":"192x192","type":"image/png","purpose":"any maskable"},
-    {"src":"./icon-512.png","sizes":"512x512","type":"image/png","purpose":"any maskable"}
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
   ]
 }
