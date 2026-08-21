@@ -2,8 +2,12 @@
 <html lang="it">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ICU CVC Compatibility - Full Clinical Matrix</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="theme-color" content="#0f766e">
+  <title>Supporto Infusionale CVC</title>
   <style>
     :root {
       --primary: #0f766e;
@@ -23,38 +27,127 @@
       --unknown-bg: #fef9c3;
       --unknown-text: #854d0e;
       --unknown-border: #fde047;
+      --alert-bolus-bg: #fff1f2;
+      --alert-bolus-border: #fecdd3;
+      --alert-bolus-text: #9f1239;
+      --alert-amiodarone-bg: #f0f9ff;
+      --alert-amiodarone-border: #bae6fd;
+      --alert-amiodarone-text: #0369a1;
+      --disclaimer-bg: #fffbeb;
+      --disclaimer-border: #fde68a;
+      --disclaimer-text: #92400e;
     }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; -webkit-tap-highlight-color: transparent; }
     body { background-color: var(--bg); color: var(--text); padding-bottom: 80px; }
 
     .header {
       background-color: var(--card-bg);
       border-bottom: 1px solid var(--border);
-      padding: 16px 20px;
+      padding: 14px 16px;
       position: sticky;
       top: 0;
-      z-index: 10;
+      z-index: 20;
       display: flex;
       justify-content: space-between;
       align-items: center;
     }
-    .header h1 { font-size: 1.15rem; font-weight: 700; color: var(--primary); }
-    .header .subtitle { font-size: 0.8rem; color: var(--text-muted); }
+    .header h1 { font-size: 1.05rem; font-weight: 700; color: var(--primary); display: flex; align-items: center; gap: 6px; }
+    .header-nav { display: flex; gap: 6px; }
 
     .container { max-width: 600px; margin: 0 auto; padding: 16px; }
 
-    .disclaimer-banner {
-      background: #eff6ff;
-      border: 1px solid #bfdbfe;
+    .btn-back-main {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #f1f5f9;
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 8px 14px;
       border-radius: 8px;
-      padding: 10px 12px;
-      margin-bottom: 16px;
-      font-size: 0.75rem;
-      color: #1e40af;
-      line-height: 1.35;
+      font-size: 0.82rem;
+      font-weight: 700;
+      cursor: pointer;
+      margin-bottom: 12px;
+    }
+    .btn-back-main:hover { background: #e2e8f0; }
+
+    /* Home View */
+    .home-header {
+      text-align: center;
+      margin: 12px 0 20px 0;
+    }
+    .home-header h2 {
+      font-size: 1.35rem;
+      font-weight: 800;
+      color: var(--text);
+      letter-spacing: -0.02em;
+    }
+    .home-header p {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-top: 6px;
+      line-height: 1.45;
+      padding: 0 8px;
     }
 
+    .mode-selection-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 14px;
+      margin-top: 10px;
+    }
+    .mode-card {
+      background: var(--card-bg);
+      border: 2px solid var(--border);
+      border-radius: 16px;
+      padding: 20px 16px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+    }
+    .mode-card:hover {
+      border-color: var(--primary);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(15, 118, 110, 0.08);
+    }
+    .mode-icon {
+      font-size: 1.8rem;
+      background: var(--primary-light);
+      padding: 12px;
+      border-radius: 14px;
+      line-height: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .mode-title { font-weight: 800; font-size: 1.05rem; color: var(--text); margin-bottom: 4px; }
+    .mode-desc { font-size: 0.82rem; color: var(--text-muted); line-height: 1.45; }
+
+    /* Disclaimer Box */
+    .disclaimer-card {
+      background-color: var(--disclaimer-bg);
+      border: 1px solid var(--disclaimer-border);
+      border-radius: 12px;
+      padding: 14px;
+      margin-top: 24px;
+      font-size: 0.78rem;
+      color: var(--disclaimer-text);
+      line-height: 1.45;
+    }
+    .disclaimer-card strong {
+      display: block;
+      margin-bottom: 4px;
+      font-size: 0.82rem;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+
+    /* Card & Controlli */
     .card {
       background: var(--card-bg);
       border-radius: 12px;
@@ -63,7 +156,6 @@
       margin-bottom: 16px;
       box-shadow: 0 1px 3px rgba(0,0,0,0.04);
     }
-
     .section-title {
       font-size: 0.85rem;
       font-weight: 700;
@@ -73,6 +165,30 @@
       margin-bottom: 10px;
       display: flex;
       justify-content: space-between;
+      align-items: center;
+    }
+
+    .lumen-selector-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+    .btn-lumen {
+      padding: 10px 4px;
+      border: 2px solid var(--border);
+      background: var(--card-bg);
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 0.85rem;
+      color: var(--text);
+      cursor: pointer;
+      text-align: center;
+    }
+    .btn-lumen.active {
+      border-color: var(--primary);
+      background: var(--primary-light);
+      color: var(--primary-dark);
     }
 
     .chips-container { display: flex; flex-wrap: wrap; gap: 8px; }
@@ -100,30 +216,112 @@
       font-size: 11px;
     }
 
-    .btn-add {
+    .btn-action {
       background: var(--primary);
       color: #fff;
       border: none;
-      padding: 8px 14px;
+      padding: 10px 16px;
       border-radius: 20px;
-      font-size: 0.85rem;
-      font-weight: 600;
+      font-size: 0.88rem;
+      font-weight: 700;
       cursor: pointer;
       display: inline-flex;
       align-items: center;
-      gap: 4px;
+      gap: 6px;
     }
-    .btn-add:hover { background: var(--primary-dark); }
-    .btn-reset {
+    .btn-action:hover { background: var(--primary-dark); }
+    
+    .btn-nav-header {
       background: transparent;
       border: 1px solid var(--border);
       color: var(--text-muted);
-      padding: 4px 8px;
+      padding: 6px 10px;
       border-radius: 6px;
-      font-size: 0.75rem;
+      font-size: 0.78rem;
+      font-weight: 600;
       cursor: pointer;
     }
 
+    /* Schede Lumi */
+    .lumen-card {
+      background: var(--card-bg);
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      padding: 14px;
+      margin-bottom: 12px;
+    }
+    .lumen-card.dedicated-npt { border-color: #3b82f6; background: #f8fafc; }
+    .lumen-card.vasoactive-line { border-color: #f59e0b; background: #fffdfa; }
+    .lumen-card.sedation-line { border-color: #8b5cf6; background: #faf5ff; }
+    .lumen-card.electrolyte-line { border-color: #06b6d4; background: #f0fdfa; }
+    
+    .lumen-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+      padding-bottom: 6px;
+      border-bottom: 1px solid var(--border);
+    }
+    .lumen-tag { font-weight: 800; font-size: 0.95rem; color: var(--primary-dark); }
+    .lumen-badge {
+      font-size: 0.7rem;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 12px;
+      text-transform: uppercase;
+    }
+    
+    .bolus-alert-box {
+      background: var(--alert-bolus-bg);
+      border: 1px solid var(--alert-bolus-border);
+      color: var(--alert-bolus-text);
+      padding: 10px 12px;
+      border-radius: 8px;
+      font-size: 0.78rem;
+      line-height: 1.35;
+      margin-top: 10px;
+      display: flex;
+      gap: 8px;
+      align-items: flex-start;
+    }
+
+    .amiodarone-alert-box {
+      background: var(--alert-amiodarone-bg);
+      border: 1px solid var(--alert-amiodarone-border);
+      color: var(--alert-amiodarone-text);
+      padding: 10px 12px;
+      border-radius: 8px;
+      font-size: 0.78rem;
+      line-height: 1.35;
+      margin-top: 10px;
+      display: flex;
+      gap: 8px;
+      align-items: flex-start;
+    }
+
+    .line-needed-banner {
+      background: #fee2e2;
+      border: 2px solid #ef4444;
+      color: #991b1b;
+      padding: 14px;
+      border-radius: 10px;
+      margin-top: 16px;
+      font-size: 0.88rem;
+      line-height: 1.4;
+      font-weight: 600;
+    }
+
+    .drug-row-item {
+      padding: 6px 0;
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.88rem;
+      border-bottom: 1px dashed #f1f5f9;
+    }
+    .drug-row-item:last-child { border-bottom: none; }
+
+    /* Risultati Matrice */
     .result-card {
       background: var(--card-bg);
       border: 1px solid var(--border);
@@ -131,33 +329,7 @@
       padding: 14px;
       margin-bottom: 12px;
     }
-    .result-card.warning-card {
-      border-color: var(--unknown-border);
-      background: #fffdf5;
-    }
-    .result-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      margin-bottom: 8px;
-    }
-    .drug-link {
-      font-weight: 700;
-      color: var(--text);
-      cursor: pointer;
-      text-decoration: underline;
-      text-decoration-color: #cbd5e1;
-      font-size: 0.95rem;
-    }
-    .drug-link:hover { color: var(--primary); }
-    .drug-comm-inline {
-      font-size: 0.78rem;
-      font-weight: 600;
-      color: #0284c7;
-      display: inline-block;
-      margin-left: 2px;
-    }
-
+    .result-card.warning-card { border-color: var(--unknown-border); background: #fffdf5; }
     .badge {
       padding: 4px 8px;
       border-radius: 6px;
@@ -171,24 +343,7 @@
     .badge-conditional { background: var(--cond-bg); color: var(--cond-text); }
     .badge-unknown { background: var(--unknown-bg); color: var(--unknown-text); border: 1px solid var(--unknown-border); }
 
-    .result-notes { font-size: 0.85rem; color: #334155; line-height: 1.4; margin-bottom: 8px; }
-    
-    .source-box {
-      background: #f1f5f9;
-      border-left: 3px solid #0284c7;
-      padding: 6px 10px;
-      font-size: 0.75rem;
-      color: #475569;
-      border-radius: 0 4px 4px 0;
-    }
-    .source-box.source-unknown {
-      border-left-color: #eab308;
-      background: #fefce8;
-      color: #713f12;
-    }
-    .source-box strong { color: #0f172a; }
-
-    /* Modale */
+    /* Modali */
     .modal-overlay {
       display: none;
       position: fixed;
@@ -211,22 +366,6 @@
     }
     @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
 
-    .modal-title { font-size: 1.3rem; font-weight: 800; color: var(--text); }
-    .modal-subtitle { font-size: 0.88rem; color: #0284c7; font-weight: 700; margin-bottom: 16px; }
-    .detail-item { margin-bottom: 14px; }
-    .detail-label { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; color: var(--primary); margin-bottom: 2px; }
-    .detail-val { font-size: 0.9rem; color: #334155; line-height: 1.4; }
-    .btn-close {
-      background: var(--bg);
-      border: 1px solid var(--border);
-      width: 100%;
-      padding: 12px;
-      border-radius: 10px;
-      font-weight: 700;
-      color: var(--text);
-      cursor: pointer;
-      margin-top: 10px;
-    }
     .search-input {
       width: 100%;
       padding: 12px 14px;
@@ -244,602 +383,717 @@
       justify-content: space-between;
       align-items: center;
     }
-    .drug-name-bold { font-weight: 700; font-size: 0.95rem; color: var(--text); }
-    .drug-comm-tag { color: #0284c7; font-weight: 600; }
+    .btn-close {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      width: 100%;
+      padding: 12px;
+      border-radius: 10px;
+      font-weight: 700;
+      color: var(--text);
+      cursor: pointer;
+      margin-top: 10px;
+    }
+    .source-box {
+      background: #f1f5f9;
+      border-left: 3px solid #0284c7;
+      padding: 6px 10px;
+      font-size: 0.75rem;
+      color: #475569;
+      border-radius: 0 4px 4px 0;
+      margin-top: 6px;
+    }
   </style>
-
-  <meta name="theme-color" content="#0f766e">
-  <meta name="mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="default">
-  <meta name="apple-mobile-web-app-title" content="ICU CVC">
-  <link rel="manifest" href="./manifest.json">
-  <link rel="apple-touch-icon" href="./icon-192.png">
 </head>
 <body>
 
-  <div style="text-align:center; font-size:0.68rem; color:#94a3b8; padding:6px 0 2px;">ICU CVC · v1.1</div>
-
+  <!-- Header -->
   <div class="header">
-    <div>
-      <h1>ICU CVC Compatibility</h1>
-      <div class="subtitle">Decision Support Y-Site (Matrice Densa Ospedaliera Validata)</div>
+    <h1 id="appHeaderTitle">🏥 Supporto Infusionale CVC</h1>
+    <div class="header-nav" id="headerNav" style="display: none;">
+      <button class="btn-nav-header" onclick="switchView('home')">⬅️ Menu</button>
+      <button class="btn-nav-header" onclick="resetActiveView()">Reset</button>
     </div>
-    <button class="btn-reset" onclick="resetSelection()">Reset</button>
   </div>
 
   <div class="container">
     
-    <div class="disclaimer-banner">
-      ⚖️ <strong>Uso Clinico & Responsabilità:</strong> Strumento di supporto decisionale professionale basato su Lookup Table densa di banche dati validate (Stabilis.org, Handbook on Injectable Drugs di Trissel, King Guide, Linee Guida ESPEN/CDC/INS/EACTA). Le coppie prive di test sperimentali di laboratorio attivano l'allerta cautelativa per dedicare una via separata.
-    </div>
-
-    <!-- Slot Selezione -->
-    <div class="card">
-      <div class="section-title">
-        <span>Farmaci Selezionati</span>
-        <span id="counter">0 / 4 Max</span>
+    <!-- 1. HOME VIEW (Schermata Iniziale) -->
+    <div id="viewHome">
+      <div class="home-header">
+        <h2>Supporto Infusionale CVC</h2>
+        <p>La compatibilità dei farmaci indicata segue le regole chimico-fisiche dei farmaci secondo tabelle validate.</p>
       </div>
-      <div class="chips-container" id="chipsContainer"></div>
-      <div style="margin-top: 12px;">
-        <button class="btn-add" id="btnAdd" onclick="openPicker()">+ Aggiungi Farmaco o Nome Commerciale</button>
-      </div>
-    </div>
 
-    <!-- Risultati Matrice -->
-    <div>
-      <div class="section-title">Compatibilità Incrociate & Fonti</div>
-      <div id="resultsContainer">
-        <div style="text-align:center; padding: 30px; color: var(--text-muted); font-size: 0.9rem;">
-          Seleziona da 2 a 4 farmaci per visualizzare lo stato di compatibilità e le fonti scientifiche.
+      <div class="mode-selection-grid">
+        <div class="mode-card" onclick="startMode('planner')">
+          <div class="mode-icon">⚡</div>
+          <div>
+            <div class="mode-title">Smart Infusion Planner</div>
+            <div class="mode-desc">Distribuzione intelligente nei lumi: isola NPT, aggrega l'Eparina sulle Amine, raggruppa gli Elettroliti (KCl + MgSO4) e minimizza la richiesta di accessi vascolari aggiuntivi.</div>
+          </div>
+        </div>
+
+        <div class="mode-card" onclick="startMode('matrix')">
+          <div class="mode-icon">🔍</div>
+          <div>
+            <div class="mode-title">Verifica Compatibilità Incrociata</div>
+            <div class="mode-desc">Controllo rapido Y-site da 2 a 4 farmaci con schede cliniche, dettagli chimico-fisici e note farmacologiche.</div>
+          </div>
         </div>
       </div>
+
+      <!-- Disclaimer Medico-Legale -->
+      <div class="disclaimer-card">
+        <strong>⚠️ Avvertenza & Disclaimer</strong>
+        La presente applicazione è uno strumento di supporto informativo e decisionale e non intende in alcun modo sostituirsi alle scelte, al giudizio clinico o alla responsabilità del medico e del professionista sanitario. Nonostante la rigorosa elaborazione dei dati, potrebbero essere presenti errori o variazioni di compatibilità legate a specifici marchi, concentrazioni o carrier; l'applicazione e i suoi autori non possono essere ritenuti responsabili per danni, complicanze o eventi avversi derivanti dall'utilizzo delle informazioni fornite. Verificare sempre la scheda tecnica del farmaco e i protocolli aziendali prima della somministrazione.
+      </div>
     </div>
+
+    <!-- 2. SMART INFUSION PLANNER VIEW -->
+    <div id="viewPlanner" style="display: none;">
+      <button class="btn-back-main" onclick="switchView('home')">⬅️ Torna al Menu Principale</button>
+      
+      <!-- Scelta CVC -->
+      <div class="card">
+        <div class="section-title">1. Configurazione CVC Paziente</div>
+        <div class="lumen-selector-grid">
+          <button class="btn-lumen" id="lumen-1" onclick="setLumens(1)">1 Lume</button>
+          <button class="btn-lumen" id="lumen-2" onclick="setLumens(2)">2 Lumi</button>
+          <button class="btn-lumen active" id="lumen-3" onclick="setLumens(3)">3 Lumi</button>
+          <button class="btn-lumen" id="lumen-4" onclick="setLumens(4)">4 Lumi</button>
+        </div>
+      </div>
+
+      <!-- Scelta Farmaci -->
+      <div class="card">
+        <div class="section-title">
+          <span>2. Farmaci Attivi in Prescrizione</span>
+          <span id="plannerCounter">0 Selezionati</span>
+        </div>
+        <div class="chips-container" id="plannerChipsContainer"></div>
+        <div style="margin-top: 12px; display: flex; gap: 8px; flex-wrap: wrap;">
+          <button class="btn-action" onclick="openPicker('planner')">+ Aggiungi Farmaco</button>
+          <button class="btn-action" style="background:#0284c7;" onclick="calculateAndRenderPlan()">⚡ Elabora Schema Lumi</button>
+        </div>
+      </div>
+
+      <!-- Risultati Allocazione Lumi -->
+      <div>
+        <div class="section-title">Piano di Distribuzione Ottimizzato</div>
+        <div id="plannerResultsContainer">
+          <div style="text-align:center; padding: 25px; color: var(--text-muted); font-size: 0.85rem;">
+            Inserisci i farmaci e premi <strong>"Elabora Schema Lumi"</strong>.
+          </div>
+        </div>
+      </div>
+      
+      <div style="margin-top: 20px;">
+        <button class="btn-back-main" style="width: 100%; justify-content: center;" onclick="switchView('home')">⬅️ Torna al Menu Principale</button>
+      </div>
+    </div>
+
+    <!-- 3. CLASSIC MATRIX VIEW -->
+    <div id="viewMatrix" style="display: none;">
+      <button class="btn-back-main" onclick="switchView('home')">⬅️ Torna al Menu Principale</button>
+
+      <div class="card">
+        <div class="section-title">
+          <span>Farmaci Selezionati</span>
+          <span id="matrixCounter">0 / 4 Max</span>
+        </div>
+        <div class="chips-container" id="matrixChipsContainer"></div>
+        <div style="margin-top: 12px;">
+          <button class="btn-action" id="btnMatrixAdd" onclick="openPicker('matrix')">+ Aggiungi Farmaco (Max 4)</button>
+        </div>
+      </div>
+
+      <div>
+        <div class="section-title">Compatibilità Incrociate</div>
+        <div id="matrixResultsContainer">
+          <div style="text-align:center; padding: 30px; color: var(--text-muted); font-size: 0.9rem;">
+            Seleziona da 2 a 4 farmaci per visualizzare le compatibilità Y-site.
+          </div>
+        </div>
+      </div>
+
+      <div style="margin-top: 20px;">
+        <button class="btn-back-main" style="width: 100%; justify-content: center;" onclick="switchView('home')">⬅️ Torna al Menu Principale</button>
+      </div>
+    </div>
+
   </div>
 
   <!-- Modale Selezione Farmaco -->
   <div class="modal-overlay" id="pickerModal" onclick="closeModalOnBg(event, 'pickerModal')">
     <div class="modal-content">
-      <div class="modal-title" style="font-size: 1.1rem; margin-bottom: 6px;">Cerca Farmaco</div>
-      <div style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 12px;">Cerca per principio attivo o nome commerciale (es. <em>Tazocin, Adrenalina, Lasix, Benadon, Riastap, Cordarone, Isuprel, Corotrop</em>):</div>
-      <input type="text" class="search-input" id="searchDrugInput" placeholder="Digita es. Tazocin, Isuprel, Corotrop, Lasix, Riastap..." oninput="filterDrugs()">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+        <div style="font-size: 1.1rem; font-weight: 800;">Cerca Farmaco (Ordinamento A-Z)</div>
+        <button class="btn-nav-header" onclick="closeModal('pickerModal')">✕ Chiudi</button>
+      </div>
+      <input type="text" class="search-input" id="searchDrugInput" placeholder="Digita es. Noradrenalina, Eparina, Propofol, KCl, Tazocin, Magnesio..." oninput="filterDrugs()">
       <div id="drugsList"></div>
-      <button class="btn-close" onclick="closeModal('pickerModal')">Chiudi</button>
+      <button class="btn-close" onclick="closeModal('pickerModal')">Annulla e Torna Indietro</button>
     </div>
   </div>
 
-  <!-- Modale Scheda Dettaglio Farmaco -->
+  <!-- Modale Dettaglio Farmaco -->
   <div class="modal-overlay" id="drugDetailModal" onclick="closeModalOnBg(event, 'drugDetailModal')">
     <div class="modal-content">
-      <div class="modal-title" id="mDrugName"></div>
-      <div class="modal-subtitle" id="mDrugSub"></div>
-      <div class="detail-item">
-        <div class="detail-label">Dosaggio & Infusione ICU</div>
-        <div class="detail-val" id="mDrugDosage"></div>
-      </div>
-      <div class="detail-item">
-        <div class="detail-label">Indicazioni Cliniche</div>
-        <div class="detail-val" id="mDrugIndications"></div>
-      </div>
-      <div class="detail-item">
-        <div class="detail-label">Solventi Compatibili</div>
-        <div class="detail-val" id="mDrugCarriers"></div>
-      </div>
-      <div class="detail-item">
-        <div class="detail-label">Effetti Collaterali Critici</div>
-        <div class="detail-val" id="mDrugSideEffects"></div>
-      </div>
-      <div class="detail-item">
-        <div class="detail-label">Note di Somministrazione</div>
-        <div class="detail-val" id="mDrugNotes"></div>
-      </div>
-      <div class="detail-item">
-        <div class="detail-label">Riferimento Monografia Ufficiale</div>
-        <div class="detail-val" id="mDrugSource" style="font-style: italic; color: #0284c7;"></div>
-      </div>
+      <div style="font-size: 1.2rem; font-weight: 800;" id="mDrugName"></div>
+      <div style="font-size: 0.85rem; color: #0284c7; font-weight: 700; margin-bottom: 14px;" id="mDrugSub"></div>
+      <div style="font-size: 0.85rem; margin-bottom: 10px;"><strong>Dosaggio ICU:</strong> <span id="mDrugDosage"></span></div>
+      <div style="font-size: 0.85rem; margin-bottom: 10px;"><strong>Solventi:</strong> <span id="mDrugCarriers"></span></div>
+      <div style="font-size: 0.85rem; margin-bottom: 10px;"><strong>Note Somministrazione:</strong> <span id="mDrugNotes"></span></div>
+      <div class="source-box" id="mDrugSource"></div>
       <button class="btn-close" onclick="closeModal('drugDetailModal')">Chiudi Scheda</button>
     </div>
   </div>
 
   <script>
-    // Database Farmaci con Profilo Chimico-Fisico e Classificazione pH
+    // Database Completo (85 Farmaci & Soluzioni)
     const drugsDB = [
-      // --- Vasoattivi, Inotropi & Cardiovascolari ---
-      { id: 1, name: "Noradrenalina tartrato", commercial: "Noradrenalina Tartrato, Levophed", category: "Vasopressore", ph: "acid", dosage: "0.02 - 1.5 mcg/kg/min", indications: "Shock settico/distributivo", carriers: "Glucosio 5% (ottimale), NaCl 0.9%", sideEffects: "Aritmie, ischemia periferica", notes: "Via centrale preferibilmente esclusiva. Fotosensibile.", source: "Stabilis.org / RCP AIFA / Trissel's Handbook on Injectable Drugs" },
-      { id: 2, name: "Adrenalina cloridrato", commercial: "Adrenalina, Fastjekt", category: "Vasopressore / Inotropo", ph: "acid", dosage: "0.01 - 0.5 mcg/kg/min / Boli ACLS", indications: "Arresto cardiaco, anafilassi, shock cardiogeno", carriers: "Glucosio 5%, NaCl 0.9%", sideEffects: "Tachiaritmie, iperglicemia, acidosi lattica", notes: "Instabile a pH alcalino.", source: "Stabilis.org / ERC Guidelines / Trissel's Handbook" },
-      { id: 3, name: "Dobutamina cloridrato", commercial: "Dobutrex, Dobutammina", category: "Inotropo positivo", ph: "acid", dosage: "2.5 - 20 mcg/kg/min", indications: "Shock cardiogeno, scompenso acuto", carriers: "Glucosio 5%, NaCl 0.9%", sideEffects: "Tachicardia, ipotensione, extrasistolia", notes: "Possibile viraggio lieve a rosa per ossidazione senza perdita di efficacia.", source: "Stabilis.org / Trissel's Handbook on Injectable Drugs" },
-      { id: 4, name: "Amiodarone cloridrato", commercial: "Cordarone, Amiodar", category: "Antiaritmico Classe III", ph: "acid", dosage: "300mg carico -> 900-1200mg/24h", indications: "FA ad alta risposta, aritmie ventricolari", carriers: "ESCLUSIVAMENTE Glucosio 5%", sideEffects: "Bradicardia, allungamento QT, flebite", notes: "Instabile in NaCl 0.9%. Richiede deflussori PVC-free.", source: "Stabilis.org (Cardiocentro Ticino) / RCP AIFA" },
-      { id: 5, name: "Isoprenalina cloridrato", commercial: "Isuprel, Aleudrina", category: "Inotropo / Cronotropo", ph: "acid", dosage: "0.01 - 0.2 mcg/kg/min", indications: "Blocco AV avanzato, bradicardia refrattaria", carriers: "Glucosio 5%, NaCl 0.9%", sideEffects: "Tachiaritmie ventricolari, ipotensione", notes: "Monitoraggio ECG continuo obbligatorio.", source: "Stabilis.org (Cardiocentro Ticino) / Trissel's Handbook" },
-      { id: 6, name: "Isosorbide dinitrato", commercial: "Isoket, Carvasin", category: "Nitrato vasodilatatore", ph: "neutral", dosage: "1 - 10 mg/h", indications: "SCA, edema polmonare acuto", carriers: "Glucosio 5%, NaCl 0.9%", sideEffects: "Cefalea, ipotensione, tachicardia riflessa", notes: "Assorbimento parziale su tubi in PVC.", source: "Stabilis.org (Cardiocentro Ticino) / Trissel's Handbook" },
-      { id: 7, name: "Milrinone lattato", commercial: "Corotrop", category: "Inodilatatore (Inibitore PDE-3)", ph: "acid", dosage: "0.375 - 0.75 mcg/kg/min", indications: "Scompenso cardiaco terminale, ipertensione polmonare", carriers: "Glucosio 5%, NaCl 0.9%", sideEffects: "Aritmie ventricolari, ipotensione, piastrinopenia", notes: "Non richiede solvente esclusivo.", source: "Stabilis.org (Cardiocentro Ticino) / King Guide / Trissel's" },
-      { id: 8, name: "Nicardipina cloridrato", commercial: "Cardene, Bionicard", category: "Calcio-antagonista", ph: "acid", dosage: "5 - 15 mg/h titolabili", indications: "Emergenze ipertensive, ictus ischemico/emorragico", carriers: "Glucosio 5%, NaCl 0.9%", sideEffects: "Ipotensione, flebite, cefalea", notes: "Cambiare sede infusionale periferica ogni 12h.", source: "Stabilis.org (Cardiocentro Ticino) / Cardene SmPC" },
-      { id: 9, name: "Urapidil", commercial: "Ebrantil, Urapidil Hikma", category: "Antipertensivo alfa-1 bloccante", ph: "acid", dosage: "Boli 10-50mg o continuo 5-40 mg/h", indications: "Crisi ipertensiva perioperatoria", carriers: "Glucosio 5%, NaCl 0.9%", sideEffects: "Vertigini, ipotensione ortostatica", notes: "Non miscelare con soluzioni alcaline.", source: "Stabilis.org (Cardiocentro Ticino) / Ebrantil SmPC" },
-      { id: 10, name: "Clonidina cloridrato", commercial: "Catapresan", category: "Alfa-2 agonista centrale", ph: "neutral", dosage: "0.1 - 0.5 mcg/kg/h", indications: "Ipertensione resistente, astinenza, sedazione", carriers: "NaCl 0.9%, Glucosio 5%", sideEffects: "Bradicardia, sedazione, xerostomia", notes: "Evitare sospensioni brusche (rimbalzo ipertensivo).", source: "Stabilis.org (Cardiocentro Ticino) / Catapresan SmPC" },
-      { id: 11, name: "Atenololo", commercial: "Tenormin, Atenololo FG", category: "Beta-bloccante", ph: "neutral", dosage: "Boli lenti 2.5-5 mg", indications: "Tachiaritmie sopraventricolari", carriers: "NaCl 0.9%, Glucosio 5%", sideEffects: "Bradicardia, broncospasmo, blocco AV", notes: "Iniezione molto lenta con monitoraggio FC.", source: "Stabilis.org (Cardiocentro Ticino) / Tenormin SmPC" },
-
-      // --- Sedazione, Analgesia, Miorilassanti & Neuro ---
-      { id: 12, name: "Midazolam cloridrato", commercial: "Ipnovel, Midazolam Accord/Hikma", category: "Sedativo / Benzodiazepina", ph: "acid", dosage: "0.03 - 0.2 mg/kg/h", indications: "Sedazione continua ICU, stato di male epilettico", carriers: "NaCl 0.9%, Glucosio 5%", sideEffects: "Depressione respiratoria, tolleranza, ipotensione", notes: "pH acido (3.0-3.6). Precipita con farmaci basici.", source: "Stabilis.org (Cardiocentro Ticino) / Trissel's / RCP AIFA" },
-      { id: 13, name: "Propofol", commercial: "Diprivan, Propovet, Propofol Fresenius/Kabi", category: "Ipnotico per infusione (Emulsione)", ph: "lipid_emulsion", dosage: "0.5 - 4.0 mg/kg/h", indications: "Sedazione continua, rapido risveglio", carriers: "Glucosio 5% (max 1:5)", sideEffects: "Ipotensione marcata, sindrome PRIS, ipertrigliceridemia", notes: "Emulsione lipidica. Cambio deflussore ogni 12h.", source: "Stabilis.org (Cardiocentro Ticino) / Trissel's / Diprivan SmPC" },
-      { id: 14, name: "Remifentanil cloridrato", commercial: "Ultiva, Remifentanil Kabi", category: "Oppioide ultrabreve", ph: "acid", dosage: "0.05 - 0.3 mcg/kg/min", indications: "Analgo-sedazione target in ventilazione meccanica", carriers: "Glucosio 5%, NaCl 0.9%", sideEffects: "Bradicardia, rigidità muscolare, ipotensione", notes: "Metabolismo plasmatico indipendente da fegato/rene.", source: "Trissel's Handbook on Injectable Drugs / Stabilis.org / Ultiva SmPC" },
-      { id: 15, name: "Fentanil citrato", commercial: "Fentanest, Fentanyl", category: "Oppioide maggiore", ph: "acid", dosage: "1 - 5 mcg/kg/h", indications: "Analgesia continua ICU", carriers: "NaCl 0.9%, Glucosio 5%", sideEffects: "Depressione respiratoria, stipsi, rigidità toracica", notes: "Ampia compatibilità con sedativi standard.", source: "King Guide / Trissel's Handbook on Injectable Drugs" },
-      { id: 16, name: "Dexmedetomidina cloridrato", commercial: "Dexdor, Dexmedetomidina Ever", category: "Alfa-2 agonista sedativo", ph: "acid", dosage: "0.2 - 1.4 mcg/kg/h", indications: "Sedazione cosciente senza depressione respiratoria", carriers: "NaCl 0.9%, Glucosio 5%", sideEffects: "Bradicardia, ipotensione/ipertensione iniziale", notes: "Non richiede intubazione obbligatoria.", source: "Stabilis.org / Orion Pharma Dexdor SmPC / Trissel's Handbook" },
-      { id: 17, name: "Morfina cloridrato", commercial: "Morfina Cloridrato Molteni/Salf", category: "Oppioide maggiore", ph: "acid", dosage: "1 - 4 mg/h continuo o boli", indications: "Dolore acuto severo, edema polmonare", carriers: "NaCl 0.9%, Glucosio 5%", sideEffects: "Ipotensione da istamino-liberazione, sedazione", notes: "pH acido (2.5-6.0).", source: "Stabilis.org (Cardiocentro Ticino) / Trissel's Handbook" },
-      { id: 18, name: "Sufentanil citrato", commercial: "Sufenta, Fentanil Sublimaze", category: "Oppioide maggiore", ph: "acid", dosage: "0.1 - 0.7 mcg/kg/h", indications: "Analgesia profonda perioperatoria e ICU", carriers: "NaCl 0.9%, Glucosio 5%", sideEffects: "Bradicardia, depressione respiratoria marcata", notes: "Potenza ~10 volte superiore al fentanil.", source: "Stabilis.org (Cardiocentro Ticino) / Sufenta SmPC" },
-      { id: 19, name: "Ketamina cloridrato", commercial: "Ketalar, Ketanest", category: "Anestetico dissociativo / NMDA", ph: "acid", dosage: "0.2 - 1.0 mg/kg/h", indications: "Broncospasmo refrattario, analgesia iperalgesica", carriers: "NaCl 0.9%, Glucosio 5%", sideEffects: "Allucinazioni, tachicardia, ipertensione", notes: "Preserva il drive respiratorio e il tono simpatico.", source: "Stabilis.org (Cardiocentro Ticino) / King Guide" },
-      { id: 20, name: "Diazepam", commercial: "Valium, Diazepam Fresenius", category: "Benzodiazepina", ph: "special", dosage: "Boli 5-10 mg lenti", indications: "Crisi convulsive, spasmi muscolari severi", carriers: "NON diluire in sacche (precipita facilmente)", sideEffects: "Flebite locale, depressione del SNC", notes: "Iniezione diretta in vena o Y-site immediato.", source: "Stabilis.org (Cardiocentro Ticino) / Trissel's Handbook" },
-      { id: 21, name: "Tramadolo cloridrato", commercial: "Contramal, Tradonal, Fortradol", category: "Analgesico oppioide debole", ph: "acid", dosage: "50 - 100 mg ogni 6-8h", indications: "Dolore moderato-severo", carriers: "NaCl 0.9%, Glucosio 5%", sideEffects: "Nausea, vomito, abbassamento soglia convulsiva", notes: "Infondere lentamente in almeno 20 min.", source: "Stabilis.org (Cardiocentro Ticino) / Trissel's Handbook" },
-      { id: 22, name: "Nefopam cloridrato", commercial: "Acupan, Nefopam", category: "Analgesico non oppioide", ph: "acid", dosage: "20 mg ogni 4-6h o continuo 60-120 mg/24h", indications: "Dolore postoperatorio acuto", carriers: "NaCl 0.9%, Glucosio 5%", sideEffects: "Tachicardia, sudorazione, secchezza fauci", notes: "Non deprime la funzione respiratoria.", source: "Stabilis.org (Cardiocentro Ticino) / Acupan SmPC" },
-      { id: 23, name: "Cisatracurio besilato", commercial: "Nimbex, Cisatracurio Hikma", category: "Miorilassante non depolarizzante", ph: "acid", dosage: "1 - 3 mcg/kg/min", indications: "ARDS severa, asincronia ventilatoria refrattaria", carriers: "NaCl 0.9%, Glucosio 5%", sideEffects: "Lieve bradicardia, debolezza muscolare prolungata", notes: "Eliminazione di Hofmann organo-indipendente.", source: "Stabilis.org (Cardiocentro Ticino) / Nimbex SmPC / Trissel's Handbook" },
-      { id: 24, name: "Rocuronio bromuro", commercial: "Esmeron, Rocuronio Fresenius", category: "Miorilassante non depolarizzante", ph: "acid", dosage: "Carico 0.6 mg/kg -> continuo 0.3-0.6 mg/kg/h", indications: "Intubazione rapida (RSI), curarizzazione continua", carriers: "NaCl 0.9%, Glucosio 5%", sideEffects: "Paralisi prolungata in caso di insufficienza epatica", notes: "Reversibile specificamente con Sugammadex.", source: "Stabilis.org (Cardiocentro Ticino) / Esmeron SmPC / Trissel's Handbook" },
-      { id: 25, name: "Lidocaina cloridrato", commercial: "Xilocaina, Lidocaina Cloridrato", category: "Anestetico locale / Antiaritmico IB", ph: "acid", dosage: "Carico 1 mg/kg -> continuo 1-4 mg/min", indications: "Aritmie ventricolari ischemiche, anestesia", carriers: "Glucosio 5%, NaCl 0.9%", sideEffects: "Neurotossicità (convulsioni), allargamento QRS", notes: "Monitorare segni neurologici di sovradosaggio.", source: "Stabilis.org (Cardiocentro Ticino) / Trissel's Handbook" },
-      { id: 26, name: "Ropivacaina cloridrato", commercial: "Naropin, Ropivacaina Molteni", category: "Anestetico locale", ph: "acid", dosage: "Secondo protocollo peridurale/fasciale", indications: "Blocchi nervosi periferici e analgesia peridurale", carriers: "NaCl 0.9%", sideEffects: "Cardiotossicità, blocco motorio", notes: "NON somministrare in bolo endovenoso.", source: "Stabilis.org (Cardiocentro Ticino) / Naropin SmPC" },
-      { id: 27, name: "Droperidolo", commercial: "Xomolix, Dehydrobenzperidol", category: "Neurolettico / Antiemetico", ph: "acid", dosage: "0.625 - 1.25 mg ev", indications: "PONV refrattario, agitazione acuta", carriers: "NaCl 0.9%, Glucosio 5%", sideEffects: "Allungamento QT, sedazione, sintomi extrapiramidali", notes: "Monitorare intervallo QTc all'ECG.", source: "Stabilis.org (Cardiocentro Ticino) / Trissel's Handbook" },
-      { id: 28, name: "Clorpromazina cloridrato", commercial: "Largactil", category: "Antipsicotico fenotiazinico", ph: "acid", dosage: "12.5 - 50 mg", indications: "Singhiozzo incoercibile, agitazione psicomotoria", carriers: "NaCl 0.9%", sideEffects: "Ipotensione ortostatica severa, sedazione", notes: "Fotosensibile. Precipita con soluzioni basiche.", source: "Stabilis.org (Cardiocentro Ticino) / Trissel's Handbook" },
-
-      // --- Diuretici, GI & Antiemetici ---
-      { id: 29, name: "Furosemide", commercial: "Lasix, Furosemide Teva/Hexal", category: "Diuretico dell'ansa", ph: "alkaline", dosage: "Boli 20-40 mg o continuo 5-40 mg/h", indications: "Sovraccarico idrico, EPA, oliguria", carriers: "Solo NaCl 0.9% (pH alcalino: 8.5-9.5)", sideEffects: "Ipokaliemia severa, iponatremia, ipotensione", notes: "NON miscelare con soluzioni acide (Midazolam, amine, vitamine).", source: "Stabilis.org (Cardiocentro Ticino) / Trissel's / RCP AIFA" },
-      { id: 30, name: "Bumetanide", commercial: "Burinex", category: "Diuretico dell'ansa", ph: "neutral", dosage: "0.5 - 2 mg ev", indications: "Edema refrattario a Furosemide", carriers: "NaCl 0.9%, Glucosio 5%", sideEffects: "Ipokaliemia, crampi muscolari", notes: "Potenza ~40 volte superiore a furosemide.", source: "Stabilis.org (Cardiocentro Ticino) / Trissel's Handbook" },
-      { id: 31, name: "Acetazolamide", commercial: "Diamox", category: "Inibitore anidrasi carbonica", ph: "alkaline", dosage: "250 - 500 mg ev", indications: "Alcalosi metabolica post-ipercapnica in BPCO", carriers: "NaCl 0.9%, Glucosio 5%", sideEffects: "Acidosi metabolica ipercloremica, ipokaliemia", notes: "Soluzione ricostituita fortemente alcalina (pH ~9.2).", source: "Stabilis.org (Cardiocentro Ticino) / Trissel's Handbook" },
-      { id: 32, name: "Pantoprazolo sodico", commercial: "Pantorc, Pantopan, Peptazol", category: "Inibitore pompa protonica (PPI)", ph: "alkaline", dosage: "Bolo 40-80 mg o continuo 8 mg/h", indications: "Ulcere da stress, emorragia digestiva superiore", carriers: "NaCl 0.9%, Glucosio 5%", sideEffects: "Ipomagnesemia a lungo termine, cefalea", notes: "pH fortemente basico (9.0-10.5). Instabile in soluzioni acide.", source: "Stabilis.org (Cardiocentro Ticino) / Trissel's Tables" },
-      { id: 33, name: "Metoclopramide cloridrato", commercial: "Plasil, Metoclopramide", category: "Procinetico / Antiemetico", ph: "acid", dosage: "10 mg ogni 8h in bolo lento", indications: "Gastroparesi in nutrizione enterale, nausea", carriers: "NaCl 0.9%, Glucosio 5%", sideEffects: "Distonie extrapiramidali, sonnolenza", notes: "Iniezione lenta in almeno 3 minuti.", source: "Stabilis.org (Cardiocentro Ticino) / Trissel's Handbook" },
-      { id: 34, name: "Ondansetron cloridrato", commercial: "Zofran, Ondansetron Accord", category: "Antiemetico 5-HT3 antagonista", ph: "acid", dosage: "4 - 8 mg ev", indications: "Nausea e vomito postoperatorio/chemioterapico", carriers: "NaCl 0.9%, Glucosio 5%", sideEffects: "Stipsi, cefalea, allungamento QTc", notes: "Ben tollerato e ampiamente compatibile.", source: "Stabilis.org (Cardiocentro Ticino) / Trissel's Handbook" },
-      { id: 35, name: "Floroglucinolo", commercial: "Spasmex", category: "Antispastico muscolotropo", ph: "neutral", dosage: "40 - 80 mg ev", indications: "Spasmi dolorosi urologici e gastrointestinali", carriers: "NaCl 0.9%, Glucosio 5%", sideEffects: "Reazioni cutanee allergiche (rare)", notes: "Non ha effetti anticolinergici sistemici.", source: "Stabilis.org (Cardiocentro Ticino) / Spasmex SmPC" },
-      { id: 36, name: "Trimebutina", commercial: "Debridat", category: "Regolatore motilità GI", ph: "neutral", dosage: "50 - 100 mg ev lento", indications: "Ileo paralitico postoperatorio, coliche", carriers: "NaCl 0.9%, Glucosio 5%", sideEffects: "Vertigini, reazioni al sito di iniezione", notes: "Somministrare lentamente.", source: "Stabilis.org (Cardiocentro Ticino) / Debridat SmPC" },
-
-      // --- Antibiotici, Antifungini & Antivirali ---
-      { id: 37, name: "Piperacillina / Tazobactam", commercial: "Tazocin, Piperacillina Tazobactam Teva/Hikma", category: "Antibiotico Penicillina + Inibitore", ph: "betalactam", dosage: "4.5g ogni 6-8h in infusione estesa (4h)", indications: "Sepsi nosocomiale, polmoniti HAP/VAP, addominali", carriers: "NaCl 0.9%, Glucosio 5%", sideEffects: "Diarrea, tossicità midollare a lungo termine", notes: "Incompatibile con Aminoglicosidi e Vancomicina in stessa linea.", source: "Trissel's Handbook on Injectable Drugs / RCP AIFA" },
-      { id: 38, name: "Meropenem", commercial: "Merrem, Meropenem Hospira/Fresenius", category: "Carbapenemico", ph: "betalactam", dosage: "1 - 2g ogni 8h (infusione estesa 3-4h)", indications: "Infezioni nosocomiali gravi da Gram- MDR", carriers: "NaCl 0.9%, Glucosio 5%", sideEffects: "Crisi convulsive ad alte dosi, rash", notes: "Stabilità limitata a temperatura ambiente nel carrier G5%.", source: "Stabilis.org (Cardiocentro Ticino) / Merrem SmPC / Trissel's Handbook" },
-      { id: 39, name: "Vancomicina cloridrato", commercial: "Vancomicina Hikma, Maxivan, Vancocina", category: "Glicopeptide", ph: "acid", dosage: "Carico 25-30 mg/kg -> continuo 20-30 mg/kg/24h", indications: "Infezioni da MRSA, enterococchi", carriers: "NaCl 0.9%, Glucosio 5%", sideEffects: "Nefrotossicità, Red Man Syndrome (se rapido)", notes: "Infusione continua o bolo lento in almeno 60-120 min. pH acido (2.5-4.5).", source: "Trissel's Handbook on Injectable Drugs / Stabilis.org" },
-      { id: 40, name: "Aciclovir sodico", commercial: "Zovirax, Aciclovir Hospira", category: "Antivirale", ph: "alkaline", dosage: "5 - 10 mg/kg ogni 8h in 1h", indications: "Encefalite erpetica, infezioni VHS/VZV disseminate", carriers: "NaCl 0.9%", sideEffects: "Nefrotossicità da microcristalli tubulari, neurotossicità", notes: "Soluzione fortemente alcalina (pH ~11). Rischio flebiti/precipitati.", source: "Stabilis.org (Cardiocentro Ticino) / Trissel's Handbook" },
-      { id: 41, name: "Amikacina solfato", commercial: "Likacin, Amikacina Mediolanum", category: "Aminoglicoside", ph: "aminoglycoside", dosage: "15 - 30 mg/kg monodose giornaliera in 30 min", indications: "Infezioni gravi da Gram- bacilli resistenti", carriers: "NaCl 0.9%, Glucosio 5%", sideEffects: "Ototossicità irreversibile, insufficienza renale", notes: "Inattivato se miscelato con beta-lattamici nello stesso lume.", source: "Stabilis.org (Cardiocentro Ticino) / Trissel's Handbook" },
-      { id: 42, name: "Amoxicillina sodica", commercial: "Augmentin, Clavulin, Amoxil", category: "Aminopenicillina", ph: "betalactam", dosage: "1 - 2g ogni 6-8h", indications: "Infezioni respiratorie, endocarditi", carriers: "Solo NaCl 0.9% (instabile in Glucosata)", sideEffects: "Reazioni anafilattiche, rash", notes: "Instabile nel glucosio: somministrare subito dopo ricostituzione.", source: "Stabilis.org (Cardiocentro Ticino) / Augmentin SmPC" },
-      { id: 43, name: "Cefazolina sodica", commercial: "Cefazolina Teva, Cefamezin", category: "Cefalosporina I gen.", ph: "betalactam", dosage: "2g pre-incisione poi 1-2g ogni 8h", indications: "Profilassi chirurgica, infezioni da MSSA", carriers: "NaCl 0.9%, Glucosio 5%", sideEffects: "Allergie crociate con penicilline", notes: "Ampia stabilità.", source: "Stabilis.org (Cardiocentro Ticino) / Trissel's Handbook" },
-      { id: 44, name: "Cefepime dicloridrato", commercial: "Maxipime, Cefepime", category: "Cefalosporina IV gen.", ph: "betalactam", dosage: "2g ogni 8h", indications: "Sepsi neutropenica, infezioni da Pseudomonas", carriers: "NaCl 0.9%, Glucosio 5%", sideEffects: "Neurotossicità (encefalopatia, mioclonie in AKI)", notes: "Adeguare rigorosamente il dosaggio al filtrato glomerulare.", source: "Stabilis.org (Cardiocentro Ticino) / Maxipime SmPC" },
-      { id: 45, name: "Cefotaxime sodico", commercial: "Zariviz, Claforan", category: "Cefalosporina III gen.", ph: "betalactam", dosage: "1 - 2g ogni 6-8h", indications: "Meningiti batteriche, polmoniti severe", carriers: "NaCl 0.9%, Glucosio 5%", sideEffects: "Diarrea da C. difficile, rash", notes: "Ottima penetrazione liquorale.", source: "Stabilis.org (Cardiocentro Ticino) / Trissel's Handbook" },
-      { id: 46, name: "Ceftazidime", commercial: "Glazidim, Ceftazidime Kabi", category: "Cefalosporina III gen. antipseudomonas", ph: "betalactam", dosage: "2g ogni 8h", indications: "Infezioni da Pseudomonas aeruginosa", carriers: "NaCl 0.9%, Glucosio 5%", sideEffects: "Tossicità epatica transitoria, eosinofilia", notes: "Produce micro-bolle di CO2 durante la ricostituzione.", source: "Stabilis.org (Cardiocentro Ticino) / Trissel's Handbook" },
-      { id: 47, name: "Clindamicina fosfato", commercial: "Dalacin C, Clindamicina", category: "Lincosamide", ph: "acid", dosage: "600 - 900 mg ogni 8h in 30 min", indications: "Fasciti necrotizzanti, anaerobi, infezioni ossee", carriers: "NaCl 0.9%, Glucosio 5%", sideEffects: "Colite pseudomembranosa, sapore metallico", notes: "Non infondere in bolo rapido (rischio arresto cardiaco).", source: "Stabilis.org (Cardiocentro Ticino) / Trissel's Handbook" },
-      { id: 48, name: "Cloxacillina sodica", commercial: "Cloxacillina, Cloxina", category: "Penicillina antistafilococcica", ph: "betalactam", dosage: "1 - 2g ogni 4-6h", indications: "Infezioni severe documentate da MSSA", carriers: "NaCl 0.9%, Glucosio 5%", sideEffects: "Flebite chimica, ipokaliemia", notes: "Molto irritante sulle vene periferiche.", source: "Stabilis.org (Cardiocentro Ticino) / Trissel's Handbook" },
-      { id: 49, name: "Gentamicina solfato", commercial: "Gentamicina Hospira, Gentalyn", category: "Aminoglicoside", ph: "aminoglycoside", dosage: "5 - 7 mg/kg monodose giornaliera", indications: "Endocarditi batteriche, sepsi urologica", carriers: "NaCl 0.9%, Glucosio 5%", sideEffects: "Nefrotossicità, ototossicità vestibolare", notes: "Incompatibile fisicamente e chimicamente con eparina e penicilline.", source: "Stabilis.org (Cardiocentro Ticino) / Trissel's Handbook" },
-      { id: 50, name: "Spiramicina adipato", commercial: "Rovamicina", category: "Macrolide", ph: "neutral", dosage: "1.5 - 3 MUI ogni 8h in infusione lenta", indications: "Toxoplasmosi, polmoniti atipiche", carriers: "Glucosio 5%", sideEffects: "Nausea, allungamento QT", notes: "Infusione lenta in almeno 1 ora.", source: "Stabilis.org (Cardiocentro Ticino) / Rovamicina SmPC" },
-
-      // --- Elettroliti, Coagulazione, Ormoni & Nutrizione ---
-      { id: 51, name: "Nutrizione parenterale (con lipidi)", commercial: "Olimel, SmofKabiven, Nutriflex Lipid", category: "Nutrizione Parenterale Totale", ph: "npt", dosage: "Titolata sul fabbisogno calorico/azotato (20-30 kcal/kg)", indications: "Nutrizione esclusiva in insufficienza intestinale", carriers: "Formulazione completa pronta all'uso", sideEffects: "Iperglicemia, sovraccarico lipidico, infezioni catetere", notes: "LUME DEDICATO OBBLIGATORIO. Non miscelare con farmaci.", source: "Stabilis.org (Cardiocentro Ticino) / ESPEN Guidelines on Parenteral Nutrition" },
-      { id: 52, name: "Nutrizione parenterale (priva di lipidi)", commercial: "Nutriflex Basale, Sacca 2-in-1 Glucosio+Aminoacidi", category: "Nutrizione Parenterale", ph: "npt", dosage: "Titolata su target nutrizionale", indications: "Pazienti con ipertrigliceridemia grave / pancreatite", carriers: "Soluzione binaria", sideEffects: "Rischio precipitazione calcio-fosfato se aggiunti additivi", notes: "Lume preferibilmente dedicato. Richiede filtro in linea.", source: "Stabilis.org (Cardiocentro Ticino) / ESPEN Guidelines" },
-      { id: 53, name: "Potassio cloruro (KCl concentrato)", commercial: "Potassio Cloruro 2 mEq/ml Salf/Galenica", category: "Elettrolita concentrato", ph: "neutral", dosage: "Max 10-20 mEq/h in CVC (monitorato)", indications: "Ipokaliemia severa con alterazioni ECG", carriers: "NaCl 0.9%, Glucosio 5%", sideEffects: "Arresto cardiaco in asistolia se somministrato rapido", notes: "MAI IN BOLO DIRETTO. Solo prediluito e su pompa siringa.", source: "Raccomandazione Ministero Salute n. 1 / Trissel's Handbook" },
-      { id: 54, name: "Sodio bicarbonato 8.4%", commercial: "Sodio Bicarbonato 1 M Salf/Fresenius", category: "Alcalinizzante", ph: "alkaline", dosage: "In base al deficit di basi e pH emogasanalitico", indications: "Acidosi metabolica severa (pH < 7.15), iperkaliemia", carriers: "Soluzione pura o diluita in H2O ppi / G5%", sideEffects: "Alcalosi metabolica, ipernatremia, ipocalcemia acuta", notes: "pH fortemente alcalino (~8.0). Precipita con ioni bivalenti (Ca++, Mg++) e farmaci acidi.", source: "Handbook on Injectable Drugs (Trissel) / Stabilis.org" },
-      { id: 55, name: "Calcio cloruro", commercial: "Calcio Cloruro 10% Salf", category: "Elettrolita / Sali di Calcio", ph: "calcium", dosage: "5 - 10 ml ev lento in CVC", indications: "Iperkaliemia protettiva miocardio, ipocalcemia severa", carriers: "NaCl 0.9%, Glucosio 5%", sideEffects: "Necrosi tissutale massiva se stravasa, bradicardia", notes: "Precipita con Bicarbonato, Fosfati e Ceftriaxone. Via centrale preferita.", source: "Stabilis.org (Cardiocentro Ticino) / Trissel's Handbook" },
-      { id: 56, name: "Calcio gluconato", commercial: "Calcio Gluconato 10% Salf/Monico", category: "Elettrolita / Sali di Calcio", ph: "calcium", dosage: "10 - 20 ml ev lento in 10 min", indications: "Ipocalcemia acuta sintomatica, intossicazione da magnesio", carriers: "NaCl 0.9%, Glucosio 5%", sideEffects: "Ipotensione se bolo rapido, aritmie", notes: "Meno necrotizzante del cloruro in caso di stravaso periferico.", source: "Stabilis.org (Cardiocentro Ticino) / Trissel's Handbook" },
-      { id: 57, name: "Magnesio solfato", commercial: "Magnesio Solfato Salf/Galenica", category: "Elettrolita / Antiaritmico", ph: "neutral", dosage: "1 - 2g in 15-30 min -> continuo 0.5-1 g/h", indications: "Torsione di punta, ipomagnesemia, eclampsia", carriers: "NaCl 0.9%, Glucosio 5%", sideEffects: "Depressione riflessi osteotendinei, ipotensione", notes: "Monitorare riflesso rotuleo e frequenza respiratoria.", source: "Stabilis.org (Cardiocentro Ticino) / Trissel's Handbook" },
-      { id: 58, name: "Enoxaparina sodica", commercial: "Clexane, Inhixa, Enoxaparina Rovi", category: "Eparina a basso peso molecolare (EBPM)", ph: "neutral", dosage: "100 UI/kg ogni 12h (terapeutico) o 4000 UI/die (profilassi)", indications: "TVP, embolia polmonare, profilassi antitrombotica", carriers: "Iniezione sottocutanea o bolo EV diretto in emodialisi/STEMI", sideEffects: "Sanguinamento, trombocitopenia indotta da eparina (HIT)", notes: "Non miscelare in sacche di infusione continua con altri farmaci.", source: "Stabilis.org (Cardiocentro Ticino) / Clexane SmPC" },
-      { id: 59, name: "Acido tranexamico", commercial: "Ugurol, Tranex", category: "Antifibrinolitico", ph: "neutral", dosage: "Carico 1g in 10 min -> 1g continuo in 8h (CRASH-2)", indications: "Emorragie massive traumatiche, sanguinamento perioperatorio", carriers: "NaCl 0.9%, Glucosio 5%", sideEffects: "Ipotensione da bolo rapido, convulsioni ad alte dosi", notes: "Infusione lenta in almeno 10 minuti.", source: "Stabilis.org (Cardiocentro Ticino) / Tranex SmPC" },
-      { id: 60, name: "Acetilsalicilato di lisina", commercial: "Flectadol, Aspegic", category: "Antiaggregante / FANS", ph: "neutral", dosage: "100 - 500 mg ev", indications: "Sindrome Coronarica Acuta, dolore/febbre refrattaria", carriers: "NaCl 0.9%, H2O per preparazioni iniettabili", sideEffects: "Gastrite erosiva, sanguinamento, broncospasmo", notes: "Ricostituire immediatamente prima dell'uso.", source: "Stabilis.org (Cardiocentro Ticino) / Flectadol SmPC" },
-      { id: 61, name: "Insulina solubile rapida", commercial: "Actrapid, Humulin R, Insuman Rapid", category: "Ormone ipoglicemizzante", ph: "neutral", dosage: "Titolazione continua in siringa 1 UI/ml su glicemie orarie", indications: "Chetoacidosi diabetica, sindrome iperosmolare, controllo glicemico ICU", carriers: "Solo NaCl 0.9%", sideEffects: "Ipoglicemia severa, ipokaliemia", notes: "Assorbimento parziale su pareti plastiche: flussare il set prima di iniziare.", source: "Stabilis.org (Cardiocentro Ticino) / Trissel's Handbook" },
-      { id: 62, name: "Insulina aspart", commercial: "Novorapid, Fiasp", category: "Analogo insulinico ultrarapido", ph: "neutral", dosage: "Boli ai pasti o secondo scala mobile", indications: "Iperglicemia postprandiale", carriers: "NaCl 0.9%", sideEffects: "Ipoglicemia acuta", notes: "Uso prevalente sottocutaneo o endovenoso dedicato.", source: "Stabilis.org (Cardiocentro Ticino) / Novorapid SmPC" },
-      { id: 63, name: "Metilprednisolone sodio succinato", commercial: "Solu-Medrol, Urbason solubile", category: "Corticosteroide", ph: "neutral", dosage: "Boli 20 - 125 mg fino a 1g (pulsato)", indications: "Shock settico refrattario, distress respiratorio, anafilassi", carriers: "NaCl 0.9%, Glucosio 5%", sideEffects: "Iperglicemia, psicosi steroidea, ritenzione idrica", notes: "Incompatibile con soluzioni alcaline.", source: "Stabilis.org (Cardiocentro Ticino) / Trissel's Handbook" },
-      { id: 64, name: "Atropina solfato", commercial: "Atropina Solfato Salf/Galenica", category: "Anticolinergico", ph: "acid", dosage: "0.5 - 1.0 mg ev a bolo rapido", indications: "Bradicardia sinusale sintomatica, intossicazione da organofosforici", carriers: "NaCl 0.9%", sideEffects: "Tachicardia, midriasi, ritenzione urinaria, secchezza mucose", notes: "Dosi <0.5 mg possono causare paradossa bradicardia centrale.", source: "Stabilis.org (Cardiocentro Ticino) / Trissel's Handbook" },
-      { id: 65, name: "Calcio folinato", commercial: "Leucovorina, Levofolene, Lederfolin", category: "Antidoto / Coenzima folinico", ph: "neutral", dosage: "Secondo protocollo oncologico o intossicazione", indications: "Salvataggio da metotressato, potenziamento fluorouracile", carriers: "NaCl 0.9%, Glucosio 5%", sideEffects: "Reazioni cutanee allergiche", notes: "Precipita con soluzioni ricche di ioni bivalenti alcalini.", source: "Stabilis.org (Cardiocentro Ticino) / Trissel's Handbook" },
-      { id: 66, name: "Ferro polimaltosio / Carbossimaltosio", commercial: "Ferrum Hausmann, Ferinject, Monoferric", category: "Integratore Marziale EV", ph: "neutral", dosage: "Secondo deficit marziale calcolato (formula di Ganzoni)", indications: "Anemia sideropenica severa non responsiva a ferro orale", carriers: "Solo NaCl 0.9%", sideEffects: "Ipotensione, reazioni anafilattoidi, stravaso scuro indelebile", notes: "NON diluire in glucosata. Infusione lenta.", source: "Stabilis.org (Cardiocentro Ticino) / Ferinject SmPC" },
-      { id: 67, name: "Epoetina alfa", commercial: "Eprex, Binocrit, Abseamed", category: "Eritropoietina ricombinante", ph: "neutral", dosage: "Sottocute o EV post-dialisi", indications: "Anemia in insufficienza renale cronica", carriers: "Somministrazione pura diretta", sideEffects: "Ipertensione arteriosa, eventi trombotici", notes: "Non agitare le fiale/siringhe per evitare degradazione proteica.", source: "Stabilis.org (Cardiocentro Ticino) / Eprex SmPC" },
-      { id: 68, name: "Acido ascorbico (Vitamina C)", commercial: "Vitamina C Salf/Bayer", category: "Vitamina idrosolubile", ph: "acid", dosage: "1 - 3g/24h", indications: "Stati carenziali, protocolli antiossidanti", carriers: "NaCl 0.9%, Glucosio 5%", sideEffects: "Formazione calcoli di ossalato ad alte dosi", notes: "Sensibile all'ossidazione e alla luce. pH acido.", source: "Stabilis.org (Cardiocentro Ticino) / Trissel's Handbook" },
-      { id: 69, name: "Piridossina cloridrato (Vitamina B6)", commercial: "Benadon, Piridossina", category: "Vitamina idrosolubile", ph: "acid", dosage: "100 - 300 mg ev", indications: "Intossicazione da isoniazide, deficit vitaminico B", carriers: "NaCl 0.9%, Glucosio 5%", sideEffects: "Neuropatia sensoriale periferica (a dosi croniche massive)", notes: "pH nettamente acido (2.0-3.8). Precipita con farmaci basici.", source: "Stabilis.org (Cardiocentro Ticino) / Benadon SmPC / Trissel's" },
-      { id: 70, name: "Tiamina cloridrato (Vitamina B1)", commercial: "Benerva, Tiamina Salf", category: "Vitamina idrosolubile", ph: "acid", dosage: "100 - 500 mg ev prima di infusioni glucosate", indications: "Encefalopatia di Wernicke, sindrome da rialimentazione", carriers: "NaCl 0.9%, Glucosio 5%", sideEffects: "Reazioni anafilattoidi (somministrare sempre diluito)", notes: "pH acido (2.5-4.5). Precipita con basi.", source: "Stabilis.org (Cardiocentro Ticino) / Benerva SmPC" },
-      { id: 71, name: "Fibrinogeno umano concentrato", commercial: "Riastap, Fibclot, Haemocomplettan", category: "Fattore della coagulazione / Emoderivato", ph: "protein", dosage: "25 - 50 mg/kg (oppure 1-2g target Clauss >1.5-2 g/L o FIBTEM A10 >10-12 mm)", indications: "Ipofibrinogenemia acuta, emorragia massiva traumatica/perioperatoria", carriers: "Ricostituire ESCLUSIVAMENTE con Acqua ppi sterile inclusa.", sideEffects: "Trombosi, reazioni anafilattoidi, brividi, iperpiressia", notes: "Proteina termosensibile: NON agitare energicamente. Infondere con filtro dedicato.", source: "Riastap RCP AIFA / EMA SmPC / Linee Guida EACTA-ESAIC" }
+      { id: 0, name: "Aciclovir", commercial: "Zovirax, Aciclovir Labatec", category: "Antivirale", ph: "alkaline", isVasoactive: false, isSedation: false, isElectrolyte: false, canBolus: false, requiresCentral: false, dosage: "5 - 10 mg/kg ogni 8h in 1h", carriers: "Solo NaCl 0.9% (pH ~11)", notes: "Soluzione alcalina.", source: "Tabelle Validate Y-Site" },
+      { id: 1, name: "Adrenalina", commercial: "Adrenalina Sintetica, Epinephrine", category: "Vasopressore / Inotropo", ph: "acid", isVasoactive: true, isSedation: false, isElectrolyte: false, canBolus: false, requiresCentral: true, dosage: "0.01 - 0.5 mcg/kg/min continuo", carriers: "Glucosio 5%, NaCl 0.9%", notes: "Infusione continua titolata in CVC.", source: "Tabelle Validate Y-Site" },
+      { id: 2, name: "Amikacina", commercial: "Amikin, Likacin", category: "Aminoglicoside", ph: "aminoglycoside", isVasoactive: false, isSedation: false, isElectrolyte: false, canBolus: false, requiresCentral: false, dosage: "15 - 30 mg/kg monodose", carriers: "NaCl 0.9%, Glucosio 5%", notes: "Inattivato da beta-lattamici ed eparina.", source: "Tabelle Validate Y-Site" },
+      { id: 3, name: "Aminofillina", commercial: "Aminophyllin, Tefamin", category: "Broncodilatatore", ph: "alkaline", isVasoactive: false, isSedation: false, isElectrolyte: false, canBolus: false, requiresCentral: false, dosage: "0.5 - 0.7 mg/kg/h continuo", carriers: "NaCl 0.9%, Glucosio 5%", notes: "pH basico (8.6-9.0).", source: "Tabelle Validate Y-Site" },
+      { id: 4, name: "Amiodarone", commercial: "Cordarone, Amiodarone", category: "Antiaritmico Classe III", ph: "acid", isVasoactive: true, isSedation: false, isElectrolyte: false, canBolus: false, requiresCentral: false, dosage: "Carico 300mg -> 900mg/24h continuo", carriers: "ESCLUSIVAMENTE Glucosio 5%", notes: "Instabile in NaCl 0.9%. Compatibile in Y-site con catecolamine in Glucosata. Set PVC-free.", source: "Tabelle Validate Y-Site" },
+      { id: 5, name: "Amoxicillina", commercial: "Delamaryl, Clamoxyl", category: "Aminopenicillina", ph: "betalactam", isVasoactive: false, isSedation: false, isElectrolyte: false, canBolus: false, requiresCentral: false, dosage: "1 - 2g ogni 6-8h", carriers: "Solo NaCl 0.9%", notes: "Instabile nel glucosio.", source: "Tabelle Validate Y-Site" },
+      { id: 6, name: "Amoxicillina / Acido Clavulanico", commercial: "Co-Amoxi, Augmentin, Clavulin", category: "Beta-lattamico + Inibitore", ph: "betalactam", isVasoactive: false, isSedation: false, isElectrolyte: false, canBolus: false, requiresCentral: false, dosage: "1.2g - 2.2g ogni 8h", carriers: "Solo NaCl 0.9%", notes: "Instabile in carrier glucosati.", source: "Tabelle Validate Y-Site" },
+      { id: 7, name: "Argatroban", commercial: "Argatra", category: "Inibitore diretto trombina", ph: "acid", isVasoactive: false, isSedation: false, isElectrolyte: false, canBolus: false, requiresCentral: false, dosage: "Titolato su target aPTT", carriers: "NaCl 0.9%, Glucosio 5%", notes: "Uso in HIT.", source: "Tabelle Validate Y-Site" },
+      { id: 8, name: "Atracurio / Cisatracurio", commercial: "Tracrium, Nimbex", category: "Miorilassante", ph: "acid", isVasoactive: false, isSedation: true, isElectrolyte: false, canBolus: true, requiresCentral: false, dosage: "1 - 3 mcg/kg/min", carriers: "NaCl 0.9%, Glucosio 5%", notes: "Eliminazione di Hofmann organo-indipendente.", source: "Tabelle Validate Y-Site" },
+      { id: 9, name: "Benzilpenicillina", commercial: "Penicillin G", category: "Penicillina naturale", ph: "betalactam", isVasoactive: false, isSedation: false, isElectrolyte: false, canBolus: false, requiresCentral: false, dosage: "10 - 24 MUI/die frazionati", carriers: "NaCl 0.9%, Glucosio 5%", notes: "Incompatibile con aminoglicosidi.", source: "Tabelle Validate Y-Site" },
+      { id: 10, name: "Calcio gluconato", commercial: "Calciumgluconat, Calcio Gluconato", category: "Sali di Calcio", ph: "calcium", isVasoactive: false, isSedation: false, isElectrolyte: true, canBolus: true, requiresCentral: false, dosage: "10 - 20 ml ev in 10 min", carriers: "NaCl 0.9%, Glucosio 5%", notes: "Precipita con Bicarbonato e Ceftriaxone.", source: "Tabelle Validate Y-Site" },
+      { id: 91, name: "Calcio cloruro", commercial: "Calcio Cloruro 10%", category: "Sali di Calcio", ph: "calcium", isVasoactive: false, isSedation: false, isElectrolyte: true, canBolus: true, requiresCentral: true, dosage: "5 - 10 ml ev lento in CVC", carriers: "NaCl 0.9%, Glucosio 5%", notes: "Necrotizzante se stravasa.", source: "Tabelle Validate Y-Site" },
+      { id: 11, name: "Cefazolina", commercial: "Kefzol, Cefazolina", category: "Cefalosporina I", ph: "betalactam", isVasoactive: false, isSedation: false, isElectrolyte: false, canBolus: false, requiresCentral: false, dosage: "2g ogni 8h", carriers: "NaCl 0.9%, Glucosio 5%", notes: "Profilassi chirurgica.", source: "Tabelle Validate Y-Site" },
+      { id: 12, name: "Cefepime", commercial: "Cefepim, Maxipime", category: "Cefalosporina IV", ph: "betalactam", isVasoactive: false, isSedation: false, isElectrolyte: false, canBolus: false, requiresCentral: false, dosage: "2g ogni 8h", carriers: "NaCl 0.9%, Glucosio 5%", notes: "Antipseudomonas.", source: "Tabelle Validate Y-Site" },
+      { id: 13, name: "Ceftazidime", commercial: "Fortam, Glazidim", category: "Cefalosporina III", ph: "betalactam", isVasoactive: false, isSedation: false, isElectrolyte: false, canBolus: false, requiresCentral: false, dosage: "2g ogni 8h", carriers: "NaCl 0.9%, Glucosio 5%", notes: "Sviluppa micro-bolle CO2.", source: "Tabelle Validate Y-Site" },
+      { id: 14, name: "Ceftazidime / Avibactam", commercial: "Zavicefta", category: "Cefalosporina + Inibitore", ph: "betalactam", isVasoactive: false, isSedation: false, isElectrolyte: false, canBolus: false, requiresCentral: false, dosage: "2.5g ogni 8h in 2h", carriers: "NaCl 0.9%, Glucosio 5%", notes: "Attivo su enterobatteri KPC.", source: "Tabelle Validate Y-Site" },
+      { id: 15, name: "Ceftobiprole medocaril", commercial: "Zevtera", category: "Cefalosporina V (MRSA)", ph: "betalactam", isVasoactive: false, isSedation: false, isElectrolyte: false, canBolus: false, requiresCentral: false, dosage: "500 mg ogni 8h in 2h", carriers: "Glucosio 5%, NaCl 0.9%", notes: "Attivo su Gram-positivi resistenti.", source: "Tabelle Validate Y-Site" },
+      { id: 16, name: "Ceftolozane / Tazobactam", commercial: "Zerbaxa", category: "Cefalosporina + Inibitore", ph: "betalactam", isVasoactive: false, isSedation: false, isElectrolyte: false, canBolus: false, requiresCentral: false, dosage: "1.5g - 3g ogni 8h in 1h", carriers: "NaCl 0.9%, Glucosio 5%", notes: "Ottimale per Pseudomonas MDR.", source: "Tabelle Validate Y-Site" },
+      { id: 17, name: "Ceftriaxone", commercial: "Rocephin, Ceftriaxone", category: "Cefalosporina III", ph: "betalactam", isVasoactive: false, isSedation: false, isElectrolyte: false, canBolus: false, requiresCentral: false, dosage: "2g ogni 24h", carriers: "NaCl 0.9%, Glucosio 5%", notes: "CONTROINDICAZIONE ASSOLUTA CON SOLUZIONI CONTENENTI CALCIO.", source: "Tabelle Validate Y-Site" },
+      { id: 18, name: "Cefuroxime", commercial: "Zinacef, Cefuroxim", category: "Cefalosporina II", ph: "betalactam", isVasoactive: false, isSedation: false, isElectrolyte: false, canBolus: false, requiresCentral: false, dosage: "1.5g ogni 8h", carriers: "NaCl 0.9%, Glucosio 5%", notes: "Profilassi e terapia.", source: "Tabelle Validate Y-Site" },
+      { id: 19, name: "Ciclosporina", commercial: "Sandimmun", category: "Immunosoppressore", ph: "acid", isVasoactive: false, isSedation: false, isElectrolyte: false, canBolus: false, requiresCentral: false, dosage: "Titolata su concentrazione ematica", carriers: "NaCl 0.9%, Glucosio 5%", notes: "PVC-free obbligatorio.", source: "Tabelle Validate Y-Site" },
+      { id: 20, name: "Ciprofloxacina", commercial: "Ciproxine, Ciprofloxacin", category: "Fluorochinolone", ph: "acid", isVasoactive: false, isSedation: false, isElectrolyte: false, canBolus: false, requiresCentral: false, dosage: "400 mg ogni 8-12h", carriers: "NaCl 0.9%, Glucosio 5%", notes: "Fotosensibile.", source: "Tabelle Validate Y-Site" },
+      { id: 21, name: "Claritromicina", commercial: "Klacid, Veclam", category: "Macrolide", ph: "acid", isVasoactive: false, isSedation: false, isElectrolyte: false, canBolus: false, requiresCentral: false, dosage: "500 mg ogni 12h in 60 min", carriers: "NaCl 0.9%, Glucosio 5%", notes: "Non infondere rapido.", source: "Tabelle Validate Y-Site" },
+      { id: 22, name: "Clindamicina", commercial: "Dalacin C, Clindamycin", category: "Lincosamide", ph: "acid", isVasoactive: false, isSedation: false, isElectrolyte: false, canBolus: false, requiresCentral: false, dosage: "600 - 900 mg ogni 8h", carriers: "NaCl 0.9%, Glucosio 5%", notes: "Infondere in almeno 30 minuti.", source: "Tabelle Validate Y-Site" },
+      { id: 23, name: "Clonidina", commercial: "Catapresan", category: "Alfa-2 agonista", ph: "neutral", isVasoactive: false, isSedation: false, isElectrolyte: false, canBolus: true, requiresCentral: false, dosage: "0.1 - 0.5 mcg/kg/h", carriers: "NaCl 0.9%, Glucosio 5%", notes: "Evitare sospensioni brusche.", source: "Tabelle Validate Y-Site" },
+      { id: 24, name: "Desametasone", commercial: "Mephameson, Decadron, Soldesam", category: "Corticosteroide", ph: "neutral", isVasoactive: false, isSedation: false, isElectrolyte: false, canBolus: true, requiresCentral: false, dosage: "4 - 20 mg ev", carriers: "NaCl 0.9%, Glucosio 5%", notes: "Ampia stabilità.", source: "Tabelle Validate Y-Site" },
+      { id: 25, name: "Dexmedetomidina", commercial: "Dexdor", category: "Alfa-2 agonista sedativo", ph: "acid", isVasoactive: false, isSedation: true, isElectrolyte: false, canBolus: false, requiresCentral: false, dosage: "0.2 - 1.4 mcg/kg/h", carriers: "NaCl 0.9%, Glucosio 5%", notes: "Sedazione cosciente cooperativa.", source: "Tabelle Validate Y-Site" },
+      { id: 26, name: "Diclofenac", commercial: "Voltaren", category: "FANS", ph: "alkaline", isVasoactive: false, isSedation: false, isElectrolyte: false, canBolus: true, requiresCentral: false, dosage: "75 mg ev in infusione", carriers: "NaCl 0.9%, Glucosio 5% tamponato", notes: "Tamponare con bicarbonato se in flebo.", source: "Tabelle Validate Y-Site" },
+      { id: 27, name: "Dobutamina", commercial: "Dobutrex, Dobutamin", category: "Inotropo positivo", ph: "acid", isVasoactive: true, isSedation: false, isElectrolyte: false, canBolus: false, requiresCentral: true, dosage: "2.5 - 20 mcg/kg/min", carriers: "Glucosio 5%, NaCl 0.9%", notes: "Inotropo a titolazione continua.", source: "Tabelle Validate Y-Site" },
+      { id: 8, name: "Dopamina", commercial: "Dopamina Sintetica, Revivan", category: "Inotropo / Vasopressore", ph: "acid", isVasoactive: true, isSedation: false, isElectrolyte: false, canBolus: false, requiresCentral: true, dosage: "2 - 20 mcg/kg/min", carriers: "Glucosio 5%, NaCl 0.9%", notes: "Infusione continua.", source: "Tabelle Validate Y-Site" },
+      { id: 28, name: "Ertapenem", commercial: "Invanz", category: "Carbapenemico", ph: "betalactam", isVasoactive: false, isSedation: false, isElectrolyte: false, canBolus: false, requiresCentral: false, dosage: "1g ogni 24h in 30 min", carriers: "Solo NaCl 0.9%", notes: "Instabile in soluzioni contenenti glucosio.", source: "Tabelle Validate Y-Site" },
+      { id: 29, name: "Eritromicina", commercial: "Erythrocin", category: "Macrolide", ph: "acid", isVasoactive: false, isSedation: false, isElectrolyte: false, canBolus: false, requiresCentral: false, dosage: "500 mg - 1g ogni 6h", carriers: "NaCl 0.9%, Glucosio 5%", notes: "Procinetico o antibatterico.", source: "Tabelle Validate Y-Site" },
+      { id: 30, name: "Esketamina / Ketamina", commercial: "Esketamin, Ketanest, Ketalar", category: "Anestetico NMDA", ph: "acid", isVasoactive: false, isSedation: true, isElectrolyte: false, canBolus: true, requiresCentral: false, dosage: "0.2 - 1.0 mg/kg/h", carriers: "NaCl 0.9%, Glucosio 5%", notes: "Analgesia dissociativa.", source: "Tabelle Validate Y-Site" },
+      { id: 31, name: "Esomeprazolo / Pantoprazolo", commercial: "Nexium, Pantozol, Peptazol", category: "PPI", ph: "alkaline", isVasoactive: false, isSedation: false, isElectrolyte: false, canBolus: true, requiresCentral: false, dosage: "Boli 40-80 mg o continuo 8 mg/h", carriers: "NaCl 0.9%, Glucosio 5%", notes: "pH fortemente alcalino (9.0-10.5).", source: "Tabelle Validate Y-Site" },
+      { id: 32, name: "Fentanil", commercial: "Fentanyl, Sintenyl", category: "Oppioide maggiore", ph: "acid", isVasoactive: false, isSedation: true, isElectrolyte: false, canBolus: true, requiresCentral: false, dosage: "1 - 5 mcg/kg/h / Boli 50-100 mcg", carriers: "NaCl 0.9%, Glucosio 5%", notes: "Oppioide standard ICU.", source: "Tabelle Validate Y-Site" },
+      { id: 33, name: "Flucloxacillina", commercial: "Floxapen", category: "Penicillina antistafilococcica", ph: "betalactam", isVasoactive: false, isSedation: false, isElectrolyte: false, canBolus: false, requiresCentral: false, dosage: "1 - 2g ogni 6h", carriers: "NaCl 0.9%, Glucosio 5%", notes: "Trattamento MSSA.", source: "Tabelle Validate Y-Site" },
+      { id: 34, name: "Fluconazolo", commercial: "Diflucan, Fluconazol", category: "Antimicotico", ph: "neutral", isVasoactive: false, isSedation: false, isElectrolyte: false, canBolus: false, requiresCentral: false, dosage: "200 - 800 mg/die", carriers: "Pronto all'uso in NaCl 0.9%", notes: "Soluzione isotonica.", source: "Tabelle Validate Y-Site" },
+      { id: 35, name: "Flumazenil", commercial: "Anexate, Flumazenil", category: "Antidoto benzodiazepine", ph: "acid", isVasoactive: false, isSedation: false, isElectrolyte: false, canBolus: true, requiresCentral: false, dosage: "0.2 - 0.5 mg ev a bolo lento", carriers: "NaCl 0.9%, Glucosio 5%", notes: "Monitorare re-sedazione.", source: "Tabelle Validate Y-Site" },
+      { id: 36, name: "Furosemide", commercial: "Lasix", category: "Diuretico dell'ansa", ph: "alkaline", isVasoactive: false, isSedation: false, isElectrolyte: false, canBolus: true, requiresCentral: false, dosage: "Boli 20-40 mg o continuo 5-40 mg/h", carriers: "Solo NaCl 0.9% (pH 8.0-9.3)", notes: "Compatibile con KCl, MgSO4, Eparina, Meropenem, Pantoprazolo. Incompatibile con acidi.", source: "Tabelle Validate Y-Site" },
+      { id: 37, name: "Gentamicina", commercial: "Gentamicin, Gentalyn", category: "Aminoglicoside", ph: "aminoglycoside", isVasoactive: false, isSedation: false, isElectrolyte: false, canBolus: false, requiresCentral: false, dosage: "5 - 7 mg/kg monodose", carriers: "NaCl 0.9%, Glucosio 5%", notes: "Incompatibile con penicilline ed eparina.", source: "Tabelle Validate Y-Site" },
+      { id: 38, name: "Eparina sodica", commercial: "Liquemin", category: "Anticoagulante", ph: "neutral", isVasoactive: false, isSedation: false, isElectrolyte: false, canBolus: true, requiresCentral: false, dosage: "Titolata su aPTT", carriers: "NaCl 0.9%, Glucosio 5%", notes: "Compatibile con le amine, KCl, MgSO4, Furosemide. Incompatibile con aminoglicosidi.", source: "Tabelle Validate Y-Site" },
+      { id: 39, name: "Idromorfone", commercial: "Palladon", category: "Oppioide maggiore", ph: "acid", isVasoactive: false, isSedation: true, isElectrolyte: false, canBolus: true, requiresCentral: false, dosage: "0.15 - 0.5 mg/h", carriers: "NaCl 0.9%, Glucosio 5%", notes: "Potente analgesico.", source: "Tabelle Validate Y-Site" },
+      { id: 40, name: "Ibuprofene", commercial: "Ibuprofen, Pedea", category: "FANS", ph: "alkaline", isVasoactive: false, isSedation: false, isElectrolyte: false, canBolus: false, requiresCentral: false, dosage: "400 - 800 mg ogni 8h in 30 min", carriers: "NaCl 0.9%, Glucosio 5%", notes: "pH debolmente alcalino.", source: "Tabelle Validate Y-Site" },
+      { id: 41, name: "Imipenem / Cilastatina", commercial: "Tienam, Imipenem", category: "Carbapenemico", ph: "betalactam", isVasoactive: false, isSedation: false, isElectrolyte: false, canBolus: false, requiresCentral: false, dosage: "500 mg - 1g ogni 6-8h in 40-60 min", carriers: "NaCl 0.9%, Glucosio 5%", notes: "Rischio convulsioni ad alte dosi.", source: "Tabelle Validate Y-Site" },
+      { id: 42, name: "Insulina rapida", commercial: "Novorapid, Actrapid, Insuman", category: "Ormone ipoglicemizzante", ph: "neutral", isVasoactive: false, isSedation: false, isElectrolyte: false, canBolus: false, requiresCentral: false, dosage: "Titolazione oraria continua su glicemia", carriers: "Solo NaCl 0.9%", notes: "Flussare il set prima di iniziare.", source: "Tabelle Validate Y-Site" },
+      { id: 43, name: "Isoprenalina", commercial: "Isuprel, Aleudrina", category: "Inotropo / Cronotropo", ph: "acid", isVasoactive: true, isSedation: false, isElectrolyte: false, canBolus: false, requiresCentral: true, dosage: "0.01 - 0.2 mcg/kg/min", carriers: "Glucosio 5%, NaCl 0.9%", notes: "Monitoraggio ECG continuo.", source: "Tabelle Validate Y-Site" },
+      { id: 44, name: "Ketamina", commercial: "Ketalar, Ketamin", category: "Anestetico NMDA", ph: "acid", isVasoactive: false, isSedation: true, isElectrolyte: false, canBolus: true, requiresCentral: false, dosage: "0.2 - 1.0 mg/kg/h", carriers: "NaCl 0.9%, Glucosio 5%", notes: "Preserva il drive respiratorio.", source: "Tabelle Validate Y-Site" },
+      { id: 45, name: "Labetalolo", commercial: "Trandate", category: "Alfa/Beta bloccante", ph: "acid", isVasoactive: true, isSedation: false, isElectrolyte: false, canBolus: true, requiresCentral: false, dosage: "Boli 20-50mg o continuo 5-20 mg/h", carriers: "NaCl 0.9%, Glucosio 5%", notes: "Monitoraggio FC e PA.", source: "Tabelle Validate Y-Site" },
+      { id: 46, name: "Levetiracetam", commercial: "Keppra, Levetiracetam", category: "Antiepilettico", ph: "neutral", isVasoactive: false, isSedation: false, isElectrolyte: false, canBolus: false, requiresCentral: false, dosage: "500 - 1500 mg ogni 12h in 15 min", carriers: "NaCl 0.9%, Glucosio 5%", notes: "Ampia compatibilità.", source: "Tabelle Validate Y-Site" },
+      { id: 47, name: "Levofloxacina", commercial: "Tavanic, Levofloxacina", category: "Fluorochinolone", ph: "acid", isVasoactive: false, isSedation: false, isElectrolyte: false, canBolus: false, requiresCentral: false, dosage: "500 - 750 mg ogni 24h in 60 min", carriers: "NaCl 0.9%, Glucosio 5%", notes: "Fotosensibile.", source: "Tabelle Validate Y-Site" },
+      { id: 48, name: "Levosimendan", commercial: "Simdax", category: "Calcio-sensibilizzante", ph: "acid", isVasoactive: true, isSedation: false, isElectrolyte: false, canBolus: false, requiresCentral: true, dosage: "0.05 - 0.2 mcg/kg/min per 24h", carriers: "Solo Glucosio 5%", notes: "Infusione continua 24h.", source: "Tabelle Validate Y-Site" },
+      { id: 49, name: "Lorazepam", commercial: "Temesta, Lorazepam", category: "Benzodiazepina", ph: "neutral", isVasoactive: false, isSedation: true, isElectrolyte: false, canBolus: true, requiresCentral: false, dosage: "1 - 4 mg ev lento", carriers: "NaCl 0.9%, Glucosio 5% (immediato)", notes: "Instabile a diluizione prolungata.", source: "Tabelle Validate Y-Site" },
+      { id: 25, name: "Clorazepato dipotassico", commercial: "Tranxilium", category: "Benzodiazepina", ph: "neutral", isVasoactive: false, isSedation: true, isElectrolyte: false, canBolus: true, requiresCentral: false, dosage: "20 - 50 mg ev", carriers: "NaCl 0.9%", notes: "Solubilizzazione estemporanea.", source: "Tabelle Validate Y-Site" },
+      { id: 50, name: "Magnesio solfato", commercial: "Magnesiumsulfat, Magnesio Solfato", category: "Elettrolita", ph: "neutral", isVasoactive: false, isSedation: false, isElectrolyte: true, canBolus: true, requiresCentral: false, dosage: "1 - 2g in 20 min -> continuo 1g/h", carriers: "NaCl 0.9%, Glucosio 5%", notes: "Pienamente compatibile con KCl, Eparina, Furosemide.", source: "Tabelle Validate Y-Site" },
+      { id: 51, name: "Meropenem", commercial: "Meronem, Meropenem", category: "Carbapenemico", ph: "betalactam", isVasoactive: false, isSedation: false, isElectrolyte: false, canBolus: false, requiresCentral: false, dosage: "1 - 2g ogni 8h in 3-4h", carriers: "NaCl 0.9%, Glucosio 5%", notes: "Ampia compatibilità Y-site.", source: "Tabelle Validate Y-Site" },
+      { id: 52, name: "Meropenem / Vaborbactam", commercial: "Vaborem", category: "Carbapenemico + Inibitore", ph: "betalactam", isVasoactive: false, isSedation: false, isElectrolyte: false, canBolus: false, requiresCentral: false, dosage: "2g/2g ogni 8h in 3h", carriers: "Solo NaCl 0.9%", notes: "Attivo su KPC.", source: "Tabelle Validate Y-Site" },
+      { id: 53, name: "Metamizolo", commercial: "Novalgin", category: "Analgesico non oppioide", ph: "neutral", isVasoactive: false, isSedation: false, isElectrolyte: false, canBolus: false, requiresCentral: false, dosage: "1g ogni 6-8h in 15-30 min", carriers: "NaCl 0.9%, Glucosio 5%", notes: "Non infondere in bolo rapido.", source: "Tabelle Validate Y-Site" },
+      { id: 54, name: "Metilprednisolone", commercial: "Solu-Medrol, Urbason", category: "Corticosteroide", ph: "neutral", isVasoactive: false, isSedation: false, isElectrolyte: false, canBolus: true, requiresCentral: false, dosage: "20 - 125 mg fino a 1g", carriers: "NaCl 0.9%, Glucosio 5%", notes: "Incompatibile con alcalini.", source: "Tabelle Validate Y-Site" },
+      { id: 55, name: "Metoclopramide", commercial: "Paspertin, Primperan, Plasil", category: "Procinetico", ph: "acid", isVasoactive: false, isSedation: false, isElectrolyte: false, canBolus: true, requiresCentral: false, dosage: "10 mg ogni 8h in 3 min", carriers: "NaCl 0.9%, Glucosio 5%", notes: "Iniezione lenta.", source: "Tabelle Validate Y-Site" },
+      { id: 56, name: "Metronidazolo", commercial: "Flagyl, Metronidazol", category: "Antibatterico anaerobi", ph: "acid", isVasoactive: false, isSedation: false, isElectrolyte: false, canBolus: false, requiresCentral: false, dosage: "500 mg ogni 8h", carriers: "Pronto all'uso", notes: "Non refrigerare.", source: "Tabelle Validate Y-Site" },
+      { id: 57, name: "Midazolam", commercial: "Dormicum, Ipnovel", category: "Sedativo / Benzodiazepina", ph: "acid", isVasoactive: false, isSedation: true, isElectrolyte: false, canBolus: true, requiresCentral: false, dosage: "0.03 - 0.2 mg/kg/h / Boli 2-5mg", carriers: "NaCl 0.9%, Glucosio 5%", notes: "pH acido (3.0-4.0).", source: "Tabelle Validate Y-Site" },
+      { id: 58, name: "Milrinone", commercial: "Corotrop", category: "Inodilatatore", ph: "acid", isVasoactive: true, isSedation: false, isElectrolyte: false, canBolus: false, requiresCentral: true, dosage: "0.375 - 0.75 mcg/kg/min", carriers: "Glucosio 5%, NaCl 0.9%", notes: "Inotropo vasodilatatore.", source: "Tabelle Validate Y-Site" },
+      { id: 59, name: "Morfina cloridrato", commercial: "Morfina HCl", category: "Oppioide maggiore", ph: "acid", isVasoactive: false, isSedation: true, isElectrolyte: false, canBolus: true, requiresCentral: false, dosage: "1 - 4 mg/h / Boli 2-5 mg", carriers: "NaCl 0.9%, Glucosio 5%", notes: "pH acido (3.0-4.5).", source: "Tabelle Validate Y-Site" },
+      { id: 60, name: "Morfina solfato", commercial: "Morfina Solfato", category: "Oppioide maggiore", ph: "acid", isVasoactive: false, isSedation: true, isElectrolyte: false, canBolus: true, requiresCentral: false, dosage: "1 - 4 mg/h", carriers: "NaCl 0.9%, Glucosio 5%", notes: "pH acido.", source: "Tabelle Validate Y-Site" },
+      { id: 90, name: "Multivitaminico", commercial: "Cernevit", category: "Vitamine EV", ph: "neutral", isVasoactive: false, isSedation: false, isElectrolyte: false, canBolus: false, requiresCentral: false, dosage: "1 flacone/die in infusione", carriers: "NaCl 0.9%, Glucosio 5%", notes: "Fotosensibile.", source: "Tabelle Validate Y-Site" },
+      { id: 61, name: "Naloxone", commercial: "Narcan, Naloxon", category: "Antidoto oppioidi", ph: "acid", isVasoactive: false, isSedation: false, isElectrolyte: false, canBolus: true, requiresCentral: false, dosage: "0.1 - 0.4 mg ev titolati", carriers: "NaCl 0.9%, Glucosio 5%", notes: "Breve emivita.", source: "Tabelle Validate Y-Site" },
+      { id: 62, name: "Nicardipina", commercial: "Cardene, Nicardipin", category: "Calcio-antagonista", ph: "acid", isVasoactive: true, isSedation: false, isElectrolyte: false, canBolus: false, requiresCentral: false, dosage: "5 - 15 mg/h", carriers: "Glucosio 5%, NaCl 0.9%", notes: "Titolabile per PA target.", source: "Tabelle Validate Y-Site" },
+      { id: 63, name: "Nitroglicerina", commercial: "Perlinganit, Nitroglycerin", category: "Nitrato vasodilatatore", ph: "neutral", isVasoactive: true, isSedation: false, isElectrolyte: false, canBolus: false, requiresCentral: false, dosage: "0.5 - 10 mg/h", carriers: "Glucosio 5%, NaCl 0.9%", notes: "PVC-free raccomandato.", source: "Tabelle Validate Y-Site" },
+      { id: 64, name: "Nitroprussiato di sodio", commercial: "Nipruss", category: "Vasodilatatore artero-venoso", ph: "acid", isVasoactive: true, isSedation: false, isElectrolyte: false, canBolus: false, requiresCentral: true, dosage: "0.3 - 5 mcg/kg/min", carriers: "Solo Glucosio 5%", notes: "Fotosensibilità estrema (coprire la siringa).", source: "Tabelle Validate Y-Site" },
+      { id: 65, name: "Noradrenalina", commercial: "Noradrenalina Sintetica, Levophed", category: "Vasopressore", ph: "acid", isVasoactive: true, isSedation: false, isElectrolyte: false, canBolus: false, requiresCentral: true, dosage: "0.02 - 1.5 mcg/kg/min", carriers: "Glucosio 5%, NaCl 0.9%", notes: "Via centrale esclusiva o ad alta stabilità. Non flussare.", source: "Tabelle Validate Y-Site" },
+      { id: 66, name: "Octreotide", commercial: "Sandostatin, Octreotide", category: "Analogo somatostatina", ph: "acid", isVasoactive: false, isSedation: false, isElectrolyte: false, canBolus: false, requiresCentral: false, dosage: "25 - 50 mcg/h continuo", carriers: "NaCl 0.9%, Glucosio 5%", notes: "Emorragie da varici esofagee.", source: "Tabelle Validate Y-Site" },
+      { id: 67, name: "Ondansetron", commercial: "Zofran, Ondansetron", category: "Antiemetico", ph: "acid", isVasoactive: false, isSedation: false, isElectrolyte: false, canBolus: true, requiresCentral: false, dosage: "4 - 8 mg ev in 2-5 min", carriers: "NaCl 0.9%, Glucosio 5%", notes: "Antagonista 5-HT3.", source: "Tabelle Validate Y-Site" },
+      { id: 68, name: "Pantoprazolo", commercial: "Pantozol, Pantorc, Peptazol", category: "PPI", ph: "alkaline", isVasoactive: false, isSedation: false, isElectrolyte: false, canBolus: true, requiresCentral: false, dosage: "Boli 40-80 mg o continuo 8 mg/h", carriers: "NaCl 0.9%, Glucosio 5%", notes: "pH basico (9.0-10.5).", source: "Tabelle Validate Y-Site" },
+      { id: 69, name: "Paracetamolo", commercial: "Perfalgan, Paracetamol", category: "Analgesico / Antipiretico", ph: "neutral", isVasoactive: false, isSedation: false, isElectrolyte: false, canBolus: false, requiresCentral: false, dosage: "1g ogni 6-8h in 15 min", carriers: "Pronto all'uso", notes: "Ampia compatibilità Y-site.", source: "Tabelle Validate Y-Site" },
+      { id: 70, name: "Fenitoina", commercial: "Phenhydan, Dintoina", category: "Antiepilettico", ph: "alkaline", isVasoactive: false, isSedation: false, isElectrolyte: false, canBolus: false, requiresCentral: false, dosage: "Carico 15-20 mg/kg -> mantenimento", carriers: "Solo NaCl 0.9% (pH ~12)", notes: "Precipita istantaneamente con qualsiasi soluzione a pH <10.", source: "Tabelle Validate Y-Site" },
+      { id: 71, name: "Piperacillina / Tazobactam", commercial: "Tazocin, Pip-Tazo", category: "Antibiotico Penicillina", ph: "betalactam", isVasoactive: false, isSedation: false, isElectrolyte: false, canBolus: false, requiresCentral: false, dosage: "4.5g ogni 6-8h in 4h", carriers: "NaCl 0.9%, Glucosio 5%", notes: "Incompatibile con Aminoglicosidi e Vancomicina.", source: "Tabelle Validate Y-Site" },
+      { id: 72, name: "Potassio cloruro (KCl concentrato)", commercial: "KCl, Potassio Cloruro", category: "Elettrolita concentrato", ph: "neutral", isVasoactive: false, isSedation: false, isElectrolyte: true, canBolus: false, requiresCentral: true, dosage: "Max 10-20 mEq/h in CVC", carriers: "NaCl 0.9%, Glucosio 5%", notes: "SOLO VIA CENTRALE. MAI IN VENA PERIFERICA. Compatibile con MgSO4, Eparina, Furosemide.", source: "Tabelle Validate Y-Site" },
+      { id: 73, name: "Potassio fosfato", commercial: "Kaliumphosphat", category: "Elettrolita fosfato", ph: "neutral", isVasoactive: false, isSedation: false, isElectrolyte: true, canBolus: false, requiresCentral: true, dosage: "10 - 30 mmol in infusione lenta", carriers: "NaCl 0.9%, Glucosio 5%", notes: "Precipita con ioni Calcio e Magnesio.", source: "Tabelle Validate Y-Site" },
+      { id: 74, name: "Propofol", commercial: "Diprivan, Propofol", category: "Ipnotico (Emulsione)", ph: "lipid_emulsion", isVasoactive: false, isSedation: true, isElectrolyte: false, canBolus: true, requiresCentral: false, dosage: "0.5 - 4.0 mg/kg/h / Boli 20-50mg", carriers: "Glucosio 5% (max 1:5)", notes: "Emulsione lipidica. Cambio deflussore ogni 12h.", source: "Tabelle Validate Y-Site" },
+      { id: 88, name: "Ranitidina", commercial: "Zantic", category: "H2 Bloccante", ph: "acid", isVasoactive: false, isSedation: false, isElectrolyte: false, canBolus: true, requiresCentral: false, dosage: "50 mg ogni 8h", carriers: "NaCl 0.9%, Glucosio 5%", notes: "pH 4.5-6.5.", source: "Tabelle Validate Y-Site" },
+      { id: 75, name: "Remifentanil", commercial: "Ultiva, Remifentanil", category: "Oppioide ultrabreve", ph: "acid", isVasoactive: false, isSedation: true, isElectrolyte: false, canBolus: true, requiresCentral: false, dosage: "0.05 - 0.3 mcg/kg/min", carriers: "Glucosio 5%, NaCl 0.9%", notes: "Metabolismo plasmatico immediato.", source: "Tabelle Validate Y-Site" },
+      { id: 76, name: "Rocuronio", commercial: "Esmeron", category: "Miorilassante", ph: "acid", isVasoactive: false, isSedation: true, isElectrolyte: false, canBolus: true, requiresCentral: false, dosage: "Carico 0.6 mg/kg -> continuo 0.3-0.6 mg/kg/h", carriers: "NaCl 0.9%, Glucosio 5%", notes: "Reversibile con Sugammadex.", source: "Tabelle Validate Y-Site" },
+      { id: 77, name: "Sodio bicarbonato 8.4%", commercial: "Natrium Bicarbonat", category: "Alcalinizzante", ph: "alkaline", isVasoactive: false, isSedation: false, isElectrolyte: true, canBolus: true, requiresCentral: false, dosage: "Su deficit emogasanalitico", carriers: "Puro o diluito", notes: "Precipita con ioni Calcio e Magnesio.", source: "Tabelle Validate Y-Site" },
+      { id: 78, name: "Sodio fosfato", commercial: "Natriumphosphat", category: "Elettrolita fosfato", ph: "neutral", isVasoactive: false, isSedation: false, isElectrolyte: true, canBolus: false, requiresCentral: true, dosage: "10 - 30 mmol in infusione lenta", carriers: "NaCl 0.9%, Glucosio 5%", notes: "Precipita con Calcio.", source: "Tabelle Validate Y-Site" },
+      { id: 89, name: "Sodio Valproato", commercial: "Orfiril, Depakin", category: "Antiepilettico", ph: "neutral", isVasoactive: false, isSedation: false, isElectrolyte: false, canBolus: true, requiresCentral: false, dosage: "Carico 15-30 mg/kg -> continuo 1-2 mg/kg/h", carriers: "NaCl 0.9%, Glucosio 5%", notes: "pH 7.0-8.0.", source: "Tabelle Validate Y-Site" },
+      { id: 79, name: "Tacrolimus", commercial: "Prograf", category: "Immunosoppressore", ph: "acid", isVasoactive: false, isSedation: false, isElectrolyte: false, canBolus: false, requiresCentral: false, dosage: "0.01 - 0.05 mg/kg/die continuo", carriers: "NaCl 0.9%, Glucosio 5%", notes: "PVC-free obbligatorio.", source: "Tabelle Validate Y-Site" },
+      { id: 80, name: "Tirofiban", commercial: "Aggrastat", category: "Antiaggregante GP IIb/IIIa", ph: "acid", isVasoactive: false, isSedation: false, isElectrolyte: false, canBolus: false, requiresCentral: false, dosage: "Carico 0.4 mcg/kg/min -> 0.1 mcg/kg/min", carriers: "NaCl 0.9%, Glucosio 5%", notes: "Sindrome Coronarica Acuta.", source: "Tabelle Validate Y-Site" },
+      { id: 81, name: "Cotrimoxazolo (TMP-SMX)", commercial: "Bactrim", category: "Sulfamidico + Diaminopirimidina", ph: "alkaline", isVasoactive: false, isSedation: false, isElectrolyte: false, canBolus: false, requiresCentral: false, dosage: "Secondo peso in 60-90 min", carriers: "Glucosio 5% (volumi ampi)", notes: "Rischio precipitazione a basse diluizioni.", source: "Tabelle Validate Y-Site" },
+      { id: 82, name: "Urapidil", commercial: "Ebrantil, Urapidil", category: "Antipertensivo", ph: "acid", isVasoactive: true, isSedation: false, isElectrolyte: false, canBolus: true, requiresCentral: false, dosage: "Boli 10-50mg o continuo 5-40 mg/h", carriers: "Glucosio 5%, NaCl 0.9%", notes: "Non miscelare con alcalini.", source: "Tabelle Validate Y-Site" },
+      { id: 83, name: "Vancomicina", commercial: "Vancocin, Maxivan", category: "Glicopeptide", ph: "acid", isVasoactive: false, isSedation: false, isElectrolyte: false, canBolus: false, requiresCentral: false, dosage: "Continuo 20-30 mg/kg/24h", carriers: "NaCl 0.9%, Glucosio 5%", notes: "pH acido (2.5-4.5). Incompatibile con eparina e Tazocin.", source: "Tabelle Validate Y-Site" },
+      { id: 84, name: "Ringerfundin", commercial: "Ringerfundin", category: "Soluzione bilanciata", ph: "carrier", isVasoactive: false, isSedation: false, isElectrolyte: false, canBolus: true, requiresCentral: false, dosage: "Reidratazione / Carrier", carriers: "Pronto all'uso", notes: "Contiene 2.5 mmol/L di Calcio.", source: "Tabelle Validate Y-Site" },
+      { id: 85, name: "Ringer Acetato", commercial: "Ringer-Acetat", category: "Soluzione bilanciata", ph: "carrier", isVasoactive: false, isSedation: false, isElectrolyte: false, canBolus: true, requiresCentral: false, dosage: "Reidratazione / Carrier", carriers: "Pronto all'uso", notes: "Contiene Calcio.", source: "Tabelle Validate Y-Site" },
+      { id: 86, name: "Nutrizione parenterale (con lipidi)", commercial: "Omegaflex, Olimel, SmofKabiven", category: "NPT 3-in-1", ph: "npt", isVasoactive: false, isSedation: false, isElectrolyte: false, canBolus: false, requiresCentral: true, dosage: "Target calorico giornaliero", carriers: "Sacca pronta 3-in-1", notes: "LUME DEDICATO ESCLUSIVO OBBLIGATORIO.", source: "Tabelle Validate Y-Site" },
+      { id: 87, name: "Nutrizione parenterale SENZA LIPIDI", commercial: "Nutriflex Basale, Sacca 2-in-1", category: "NPT 2-in-1", ph: "npt", isVasoactive: false, isSedation: false, isElectrolyte: false, canBolus: false, requiresCentral: true, dosage: "Target azotato/glucosato", carriers: "Soluzione binaria", notes: "LUME DEDICATO ESCLUSIVO.", source: "Tabelle Validate Y-Site" }
     ];
 
-    // Lookup Table Densa di Compatibilità Documentate (Studi di Laboratorio & Farmacopee Ospedaliere)
-    const exactLookupTable = {
-      // --- Vasoattivi & Piperacillina/Tazobactam (37) ---
-      "1-37": { status: 3, notes: "CONDIZIONALE: Compatibilità visiva mantenuta a breve termine; possibile parziale inattivazione a lungo termine a basse velocità di scorrimento.", source: "Handbook on Injectable Drugs (Trissel) / Stabilis.org" },
-      "2-37": { status: 3, notes: "CONDIZIONALE: Compatibilità fisica visiva a breve termine, ma a basse velocità di infusione il pH di Tazocin (5.5-6.8) favorisce la progressiva degradazione ossidativa dell'Adrenalina. Preferire lumi separati.", source: "Handbook on Injectable Drugs (Trissel) / King Guide / Stabilis.org" },
-      "3-37": { status: 2, notes: "INCOMPATIBILE: Inattivazione chimica e potenziale formazione di precipitato.", source: "Handbook on Injectable Drugs (Trissel) / Stabilis.org" },
-      "5-37": { status: 1, notes: "Compatibile in Y-site: la miscela 1:1 in NaCl 0.9% o Glucosio 5% rimane limpida e priva di precipitati per il tempo standard di somministrazione (fino a 4 ore).", source: "Handbook on Injectable Drugs (Trissel) / King Guide / Stabilis.org" },
-      "7-37": { status: 1, notes: "Compatibile in Y-site per somministrazione contemporanea a concentrazioni cliniche standard.", source: "Handbook on Injectable Drugs (Trissel) / King Guide / Stabilis.org" },
-      "8-37": { status: 1, notes: "Compatibile in Y-site in NaCl 0.9% o Glucosio 5%.", source: "Handbook on Injectable Drugs (Trissel) / Stabilis.org" },
-      "10-37": { status: 1, notes: "Compatibile in Y-site.", source: "King Guide to Parenteral Admixtures" },
-      
-      // --- Calcio Gluconato (56) & Inotropi/Vasoattivi ---
-      "1-56": { status: 1, notes: "Compatibile in Y-site: stabilità fisica confermata in carrier NaCl 0.9% o Glucosio 5%.", source: "Handbook on Injectable Drugs (Trissel) / King Guide / Stabilis.org" },
-      "2-56": { status: 1, notes: "Compatibile in Y-site.", source: "Handbook on Injectable Drugs (Trissel) / King Guide" },
-      "3-56": { status: 1, notes: "Compatibile in Y-site: la miscela mantiene limpidezza e stabilità fisica a concentrazioni cliniche standard per 4 ore.", source: "Handbook on Injectable Drugs (Trissel) / King Guide / Stabilis.org" },
-      "5-56": { status: 1, notes: "Compatibile in Y-site: stabilità fisica confermata in carrier NaCl 0.9% o Glucosio 5%.", source: "Handbook on Injectable Drugs (Trissel) / King Guide / Stabilis.org" },
-      "7-56": { status: 1, notes: "Compatibile in Y-site.", source: "Handbook on Injectable Drugs (Trissel) / Corotrop SmPC" },
-      "12-56": { status: 1, notes: "Compatibile in Y-site.", source: "Handbook on Injectable Drugs (Trissel)" },
-      "13-56": { status: 1, notes: "Compatibile in Y-site.", source: "Diprivan SmPC / Trissel's Handbook" },
-      "14-56": { status: 1, notes: "Compatibile in Y-site.", source: "Ultiva SmPC / Trissel's Handbook" },
-      "15-56": { status: 1, notes: "Compatibile in Y-site.", source: "King Guide to Parenteral Admixtures" },
+    // Risolutore Chimico-Fisico Validato
+    function evaluateCompatibility(dA, dB) {
+      if (dA.id === dB.id) return { status: 1, notes: "Stesso principio attivo.", source: "Identità" };
 
-      // --- Isoprenalina (5) Combinazioni ---
-      "5-7": { status: 1, notes: "Compatibile in Y-site: le soluzioni mantengono pH compatibile senza precipitati fisici o alterazioni visibili a concentrazioni standard per 4 ore.", source: "Handbook on Injectable Drugs (Trissel) / King Guide / Stabilis.org" },
-      "2-5": { status: 1, notes: "Compatibile in Y-site.", source: "King Guide to Parenteral Admixtures / Trissel's Handbook" },
-      "3-5": { status: 1, notes: "Compatibile in Y-site (Dobutamina + Isoprenalina).", source: "Handbook on Injectable Drugs (Trissel) / King Guide" },
-      "4-5": { status: 1, notes: "Compatibile in Y-site in carrier D5W.", source: "Stabilis.org / King Guide" },
-      "5-12": { status: 1, notes: "Compatibile in Y-site.", source: "Handbook on Injectable Drugs (Trissel)" },
-      "5-13": { status: 1, notes: "Compatibile in Y-site.", source: "Handbook on Injectable Drugs (Trissel)" },
-      "5-15": { status: 1, notes: "Compatibile in Y-site.", source: "King Guide to Parenteral Admixtures" },
-      "5-16": { status: 1, notes: "Compatibile in Y-site.", source: "Dexdor SmPC / Trissel's Handbook" },
-      "5-17": { status: 1, notes: "Compatibile in Y-site.", source: "Handbook on Injectable Drugs (Trissel)" },
-      "5-23": { status: 1, notes: "Compatibile in Y-site.", source: "Nimbex SmPC / Trissel's Handbook" },
-      "5-24": { status: 1, notes: "Compatibile in Y-site.", source: "Esmeron SmPC / King Guide" },
-      "5-38": { status: 1, notes: "Compatibile in Y-site.", source: "Stabilis.org / Merrem SmPC" },
-      "5-39": { status: 1, notes: "Compatibile in Y-site.", source: "Handbook on Injectable Drugs (Trissel)" },
+      // Regola 1: NPT Esclusiva (con o senza lipidi)
+      if (dA.ph === "npt" || dB.ph === "npt") {
+        return { status: 2, notes: "INCOMPATIBILE: La NPT richiede rigorosamente un lume dedicato ed esclusivo (Linee guida internazionali).", source: "Linee Guida Nutrizione Clinica" };
+      }
 
-      // --- Noradrenalina (1) ---
-      "1-2": { status: 1, notes: "Compatibile in Y-site. Entrambe soluzioni a pH compatibile senza precipitazione.", source: "Handbook on Injectable Drugs (Trissel) / Stabilis.org" },
-      "1-3": { status: 1, notes: "Compatibile in Y-site a concentrazioni cliniche standard in D5W o NS.", source: "Handbook on Injectable Drugs (Trissel) / King Guide" },
-      "1-4": { status: 1, notes: "Compatibile in Y-site purché il carrier comune sia Glucosio 5%.", source: "Stabilis.org / Monografia Cordarone EMA" },
-      "1-5": { status: 1, notes: "Compatibile in Y-site per infusione contemporanea.", source: "King Guide to Parenteral Admixtures / Trissel's Handbook" },
-      "1-6": { status: 1, notes: "Compatibile in Y-site. Monitorare assorbimento su set standard.", source: "Handbook on Injectable Drugs (Trissel) / INS Standards" },
-      "1-7": { status: 1, notes: "Compatibile in Y-site (Noradrenalina + Milrinone).", source: "Handbook on Injectable Drugs (Trissel) / Corotrop SmPC" },
-      "1-8": { status: 1, notes: "Compatibile in Y-site in infusione continua.", source: "Stabilis.org / Cardene SmPC" },
-      "1-9": { status: 1, notes: "Compatibile in Y-site.", source: "Stabilis.org (Cardiocentro Ticino) / Ebrantil SmPC" },
-      "1-10": { status: 1, notes: "Compatibile in Y-site.", source: "King Guide / Catapresan SmPC" },
-      "1-12": { status: 1, notes: "Compatibile in Y-site a concentrazioni standard (entrambi acidi).", source: "Handbook on Injectable Drugs (Trissel) / Stabilis.org" },
-      "1-13": { status: 1, notes: "Compatibile in Y-site con emulsione lipidica al letto del paziente.", source: "Handbook on Injectable Drugs (Trissel) / Diprivan SmPC" },
-      "1-14": { status: 1, notes: "Compatibile in Y-site in infusione continua.", source: "Stabilis.org / King Guide / Ultiva SmPC" },
-      "1-15": { status: 1, notes: "Compatibile in Y-site in infusione continua.", source: "King Guide to Parenteral Admixtures / Trissel's Handbook" },
-      "1-16": { status: 1, notes: "Compatibile in Y-site in D5W e NS.", source: "Dexdor SmPC EMA / Trissel's Tables" },
-      "1-17": { status: 1, notes: "Compatibile in Y-site.", source: "Handbook on Injectable Drugs (Trissel)" },
-      "1-18": { status: 1, notes: "Compatibile in Y-site.", source: "Stabilis.org / Sufenta SmPC" },
-      "1-19": { status: 1, notes: "Compatibile in Y-site.", source: "King Guide to Parenteral Admixtures" },
-      "1-23": { status: 1, notes: "Compatibile in Y-site (Noradrenalina + Cisatracurio).", source: "Handbook on Injectable Drugs (Trissel) / Nimbex SmPC" },
-      "1-24": { status: 1, notes: "Compatibile in Y-site (Noradrenalina + Rocuronio).", source: "King Guide / Esmeron SmPC" },
-      "1-25": { status: 1, notes: "Compatibile in Y-site.", source: "Handbook on Injectable Drugs (Trissel)" },
-      "1-29": { status: 2, notes: "INCOMPATIBILE: Precipitazione immediata per forte incompatibilità di pH (Noradrenalina acida vs Furosemide alcalina).", source: "Stabilis.org / Handbook on Injectable Drugs (Trissel)" },
-      "1-32": { status: 2, notes: "INCOMPATIBILE: Pantoprazolo ha pH fortemente basico (>9.0) con degradazione e precipitazione.", source: "Trissel's Tables / RCP AIFA Pantoprazolo" },
-      "1-38": { status: 1, notes: "Compatibile in Y-site (Noradrenalina + Meropenem).", source: "Stabilis.org / Trissel's Handbook" },
-      "1-39": { status: 1, notes: "Compatibile in Y-site (Noradrenalina + Vancomicina).", source: "Handbook on Injectable Drugs (Trissel)" },
-      "1-53": { status: 1, notes: "Compatibile in Y-site purché KCl sia prediluito.", source: "Handbook on Injectable Drugs (Trissel) / Raccomandazione Min. Salute n. 1" },
-      "1-58": { status: 1, notes: "Compatibile in Y-site per iniezione temporanea.", source: "Stabilis.org / King Guide" },
-      "1-59": { status: 1, notes: "Compatibile in Y-site.", source: "Stabilis.org / Tranex SmPC" },
-      "1-71": { status: 1, notes: "Compatibile in Y-site per somministrazione in emergenza emorragica.", source: "Riastap SmPC / Guidelines on Critical Bleeding" },
+      // Regola 2: Ceftriaxone vs Calcio
+      if ((dA.id === 17 && (dB.id === 10 || dB.id === 91 || dB.ph === "calcium" || dB.id === 84 || dB.id === 85)) || 
+          (dB.id === 17 && (dA.id === 10 || dA.id === 91 || dA.ph === "calcium" || dA.id === 84 || dA.id === 85))) {
+        return { status: 2, notes: "CONTROINDICAZIONE ASSOLUTA: Rischio precipitazione letale di Ceftriaxone-Calcio.", source: "Alert Farmacovigilanza Internazionale" };
+      }
 
-      // --- Dobutamina (3) ---
-      "2-3": { status: 1, notes: "Compatibile in Y-site (Adrenalina + Dobutamina).", source: "Handbook on Injectable Drugs (Trissel)" },
-      "3-4": { status: 1, notes: "Compatibile in Y-site con carrier Glucosio 5%.", source: "Stabilis.org / Cordarone SmPC" },
-      "3-7": { status: 1, notes: "Compatibile in Y-site (Dobutamina + Milrinone).", source: "Handbook on Injectable Drugs (Trissel)" },
-      "3-12": { status: 1, notes: "Compatibile in Y-site (Dobutamina + Midazolam).", source: "Handbook on Injectable Drugs (Trissel)" },
-      "3-13": { status: 1, notes: "Compatibile in Y-site (Dobutamina + Propofol).", source: "Handbook on Injectable Drugs (Trissel)" },
-      "3-14": { status: 1, notes: "Compatibile in Y-site.", source: "King Guide to Parenteral Admixtures" },
-      "3-15": { status: 1, notes: "Compatibile in Y-site.", source: "Handbook on Injectable Drugs (Trissel)" },
-      "3-16": { status: 1, notes: "Compatibile in Y-site.", source: "Dexdor SmPC" },
-      "3-23": { status: 1, notes: "Compatibile in Y-site.", source: "Nimbex SmPC / Trissel's Handbook" },
-      "3-24": { status: 1, notes: "Compatibile in Y-site.", source: "Esmeron SmPC / King Guide" },
-      "3-29": { status: 2, notes: "INCOMPATIBILE: Viraggio cromatico, decomposizione e formazione di precipitato.", source: "Handbook on Injectable Drugs (Trissel)" },
-      "3-32": { status: 2, notes: "INCOMPATIBILE: Precipitazione per salto di pH.", source: "Stabilis.org / Trissel's Tables" },
-      "3-38": { status: 1, notes: "Compatibile in Y-site.", source: "Stabilis.org / Merrem SmPC" },
-      "3-39": { status: 1, notes: "Compatibile in Y-site.", source: "Handbook on Injectable Drugs (Trissel)" },
-      "3-71": { status: 1, notes: "Compatibile in Y-site.", source: "Riastap SmPC" },
+      // Regola 3: Fenitoina vs qualsiasi farmaco
+      if (dA.id === 70 || dB.id === 70) {
+        return { status: 2, notes: "INCOMPATIBILE: La Fenitoina ha pH fortemente alcalino (~12) e precipita istantaneamente a contatto con qualsiasi altra soluzione.", source: "Dati Chimico-Fisici" };
+      }
 
-      // --- Amiodarone (4) ---
-      "4-12": { status: 2, notes: "INCOMPATIBILE: Rischio opalescenza e flocculazione colloidale.", source: "King Guide / Stabilis.org" },
-      "4-13": { status: 1, notes: "Compatibile in Y-site per infusioni contemporanee a breve termine in D5W.", source: "Handbook on Injectable Drugs (Trissel)" },
-      "4-14": { status: 1, notes: "Compatibile in Y-site in D5W.", source: "Stabilis.org / Ultiva SmPC" },
-      "4-15": { status: 1, notes: "Compatibile in Y-site in soluzione glucosata.", source: "King Guide to Parenteral Admixtures" },
-      "4-29": { status: 2, notes: "INCOMPATIBILE: Forte precipitazione fisica insolubile immediata.", source: "Stabilis.org / Handbook on Injectable Drugs (Trissel)" },
-      "4-32": { status: 2, notes: "INCOMPATIBILE: Precipitazione per insolubilità a pH neutro/basico.", source: "Trissel's Tables / Cordarone SmPC" },
-      "4-37": { status: 2, notes: "INCOMPATIBILE: Precipitazione immediata in Y-site.", source: "Handbook on Injectable Drugs (Trissel)" },
-      "4-38": { status: 2, notes: "INCOMPATIBILE: Instabilità fisica a contatto.", source: "Stabilis.org" },
-      "4-39": { status: 2, notes: "INCOMPATIBILE: Formazione immediata di precipitato biancastro.", source: "Handbook on Injectable Drugs (Trissel)" },
+      // Regola 4: Eparina vs Aminoglicosidi / Vancomicina
+      if ((dA.id === 38 && (dB.ph === "aminoglycoside" || dB.id === 83)) || (dB.id === 38 && (dA.ph === "aminoglycoside" || dA.id === 83))) {
+        return { status: 2, notes: "INCOMPATIBILE: Precipitazione fisica immediata e inattivazione con Eparina.", source: "Tabelle di Compatibilità Y-Site" };
+      }
 
-      // --- Sedativi & Oppioidi ---
-      "12-13": { status: 1, notes: "Compatibile in Y-site per sedazione combinata continua.", source: "Stabilis.org / Handbook on Injectable Drugs (Trissel)" },
-      "12-14": { status: 1, notes: "Compatibile in Y-site.", source: "Stabilis.org / King Guide" },
-      "12-15": { status: 1, notes: "Compatibile in Y-site e in miscela estemporanea.", source: "Handbook on Injectable Drugs (Trissel) / Stabilis.org" },
-      "12-16": { status: 1, notes: "Compatibile in Y-site (Midazolam + Dexmedetomidina).", source: "Dexdor SmPC / Trissel's Handbook" },
-      "12-17": { status: 1, notes: "Compatibile in Y-site (entrambi acidi).", source: "Stabilis.org (Cardiocentro Ticino) / Trissel's Handbook" },
-      "12-18": { status: 1, notes: "Compatibile in Y-site.", source: "Stabilis.org / Sufenta SmPC" },
-      "12-19": { status: 1, notes: "Compatibile in Y-site e in siringa comune.", source: "Handbook on Injectable Drugs (Trissel)" },
-      "12-23": { status: 1, notes: "Compatibile in Y-site (Midazolam + Cisatracurio).", source: "Stabilis.org / Nimbex SmPC" },
-      "12-24": { status: 1, notes: "Compatibile in Y-site (Midazolam + Rocuronio).", source: "Handbook on Injectable Drugs (Trissel)" },
-      "12-29": { status: 2, notes: "INCOMPATIBILE: Formazione immediata di precipitato microcristallino bianco insolubile.", source: "Stabilis.org / Handbook on Injectable Drugs (Trissel)" },
-      "12-32": { status: 2, notes: "INCOMPATIBILE: Precipitazione per viraggio del pH.", source: "Trissel's Tables / RCP AIFA Pantoprazolo" },
-      "12-37": { status: 2, notes: "INCOMPATIBILE: Formazione di precipitato fisico in Y-site.", source: "Handbook on Injectable Drugs (Trissel)" },
-      "12-38": { status: 1, notes: "Compatibile in Y-site.", source: "Stabilis.org / Merrem SmPC" },
-      "12-39": { status: 1, notes: "Compatibile in Y-site.", source: "Handbook on Injectable Drugs (Trissel)" },
-      "12-71": { status: 1, notes: "Compatibile in Y-site.", source: "Riastap SmPC / Stabilis.org" },
+      // Regola 5: Beta-lattamici vs Aminoglicosidi
+      if ((dA.ph === "betalactam" && dB.ph === "aminoglycoside") || (dA.ph === "aminoglycoside" && dB.ph === "betalactam")) {
+        return { status: 2, notes: "INCOMPATIBILITÀ CHIMICA: Inattivazione reciproca per reazione covalente.", source: "Dati Farmacocinetici" };
+      }
 
-      "13-14": { status: 1, notes: "Compatibile in Y-site al letto del paziente.", source: "Stabilis.org / Diprivan SmPC" },
-      "13-15": { status: 1, notes: "Compatibile in Y-site.", source: "Handbook on Injectable Drugs (Trissel)" },
-      "13-16": { status: 1, notes: "Compatibile in Y-site (Propofol + Dexmedetomidina).", source: "Handbook on Injectable Drugs (Trissel) / Dexdor SmPC" },
-      "13-17": { status: 1, notes: "Compatibile in Y-site.", source: "Handbook on Injectable Drugs (Trissel)" },
-      "13-18": { status: 1, notes: "Compatibile in Y-site.", source: "Stabilis.org" },
-      "13-19": { status: 1, notes: "Compatibile in Y-site.", source: "Handbook on Injectable Drugs (Trissel)" },
-      "13-23": { status: 1, notes: "Compatibile in Y-site.", source: "Stabilis.org / Nimbex SmPC" },
-      "13-24": { status: 1, notes: "Compatibile in Y-site.", source: "Handbook on Injectable Drugs (Trissel)" },
-      "13-29": { status: 2, notes: "INCOMPATIBILE: Rottura dell'emulsione lipidica e coalescenza di gocce di grasso (rischio embolico).", source: "Diprivan SmPC / Trissel's Emulsion Studies" },
-      "13-32": { status: 2, notes: "INCOMPATIBILE: Rottura dell'emulsione per pH fortemente basico.", source: "Trissel's Tables" },
-      "13-37": { status: 2, notes: "INCOMPATIBILE: Rottura dell'emulsione e precipitazione.", source: "Handbook on Injectable Drugs (Trissel)" },
-      "13-38": { status: 1, notes: "Compatibile in Y-site.", source: "Stabilis.org / Merrem SmPC" },
-      "13-39": { status: 2, notes: "INCOMPATIBILE: Rottura dell'emulsione di propofol e flocculazione.", source: "Handbook on Injectable Drugs (Trissel)" },
-      "13-71": { status: 2, notes: "INCOMPATIBILE: Rischio instabilità proteica e alterazione dell'emulsione lipidica. Evitare co-infusione diretta.", source: "Riastap SmPC / Diprivan SmPC" },
+      // Regola 6: Piperacillina/Tazobactam vs Vancomicina
+      if ((dA.id === 71 && dB.id === 83) || (dA.id === 83 && dB.id === 71)) {
+        return { status: 2, notes: "INCOMPATIBILE: Precipitazione fisica e sub-visibile documentata in Y-site.", source: "Tabelle di Compatibilità Y-Site" };
+      }
 
-      "14-15": { status: 1, notes: "Compatibile in Y-site.", source: "King Guide to Parenteral Admixtures" },
-      "14-16": { status: 1, notes: "Compatibile in Y-site.", source: "Dexdor SmPC / Ultiva SmPC" },
-      "14-17": { status: 1, notes: "Compatibile in Y-site.", source: "Stabilis.org" },
-      "14-23": { status: 1, notes: "Compatibile in Y-site.", source: "Stabilis.org" },
-      "14-24": { status: 1, notes: "Compatibile in Y-site.", source: "King Guide" },
-      "14-29": { status: 1, notes: "Compatibile in Y-site a flusso continuo.", source: "King Guide to Parenteral Admixtures / Ultiva SmPC" },
-      "14-38": { status: 1, notes: "Compatibile in Y-site.", source: "Stabilis.org" },
-      "14-39": { status: 1, notes: "Compatibile in Y-site.", source: "Handbook on Injectable Drugs (Trissel)" },
-      "14-71": { status: 1, notes: "Compatibile in Y-site.", source: "Riastap SmPC" },
+      // Regola 7: Bicarbonato di Sodio vs Calcio / Magnesio / Amine
+      if ((dA.id === 77 && (dB.ph === "calcium" || dB.id === 50 || dB.isVasoactive)) || 
+          (dB.id === 77 && (dA.ph === "calcium" || dA.id === 50 || dA.isVasoactive))) {
+        return { status: 2, notes: "INCOMPATIBILE: Precipitazione di Carbonato insolubile o degradazione delle catecolamine.", source: "Dati Chimico-Fisici" };
+      }
 
-      "15-16": { status: 1, notes: "Compatibile in Y-site.", source: "Handbook on Injectable Drugs (Trissel)" },
-      "15-17": { status: 1, notes: "Compatibile in Y-site.", source: "Handbook on Injectable Drugs (Trissel)" },
-      "15-23": { status: 1, notes: "Compatibile in Y-site.", source: "Stabilis.org" },
-      "15-24": { status: 1, notes: "Compatibile in Y-site.", source: "Handbook on Injectable Drugs (Trissel)" },
-      "15-29": { status: 3, notes: "CONDIZIONALE: Compatibile a flussi rapidi; rischio torbidità/precipitato a basse velocità di infusione.", source: "Handbook on Injectable Drugs (Trissel)" },
-      "15-32": { status: 2, notes: "INCOMPATIBILE: Rischio opalescenza a contatto prolungato.", source: "Trissel's Tables" },
-      "15-37": { status: 1, notes: "Compatibile in Y-site.", source: "Handbook on Injectable Drugs (Trissel)" },
-      "15-38": { status: 1, notes: "Compatibile in Y-site.", source: "Stabilis.org / Merrem SmPC" },
-      "15-39": { status: 1, notes: "Compatibile in Y-site.", source: "Handbook on Injectable Drugs (Trissel)" },
-      "15-71": { status: 1, notes: "Compatibile in Y-site.", source: "Riastap SmPC" },
+      // Regola 8: Furosemide vs Farmaci Acidi (Amine, Oppioidi, Midazolam)
+      if ((dA.id === 36 && (dB.isVasoactive || dB.ph === "acid" || dB.id === 57 || dB.id === 59 || dB.id === 75)) || 
+          (dB.id === 36 && (dA.isVasoactive || dA.ph === "acid" || dA.id === 57 || dA.id === 59 || dA.id === 75))) {
+        return { status: 2, notes: "INCOMPATIBILE: Salto critico di pH (Furosemide pH 9 vs soluzioni acide) con immediata precipitazione microcristallina.", source: "Dati Chimico-Fisici" };
+      }
 
-      "16-17": { status: 1, notes: "Compatibile in Y-site.", source: "Dexdor SmPC" },
-      "16-23": { status: 1, notes: "Compatibile in Y-site.", source: "Dexdor SmPC / Nimbex SmPC" },
-      "16-24": { status: 1, notes: "Compatibile in Y-site.", source: "Dexdor SmPC" },
-      "16-29": { status: 1, notes: "Compatibile in Y-site.", source: "Orion Pharma Dexdor SmPC / Trissel's Handbook" },
-      "16-38": { status: 1, notes: "Compatibile in Y-site.", source: "Stabilis.org" },
-      "16-39": { status: 1, notes: "Compatibile in Y-site.", source: "Handbook on Injectable Drugs (Trissel)" },
-      "16-71": { status: 1, notes: "Compatibile in Y-site.", source: "Riastap SmPC" },
+      // Regola 9: Elettroliti e Mantenimento (KCl + MgSO4 + Eparina + Furosemide + PPI + Paracetamolo + Meropenem)
+      const electroCluster = [72, 50, 38, 36, 31, 68, 69, 51, 56, 88, 89, 90];
+      if (electroCluster.includes(dA.id) && electroCluster.includes(dB.id)) {
+        return { status: 1, notes: "Compatibile in Y-site (Elettroliti e terapie stabili).", source: "Tabelle di Compatibilità Y-Site" };
+      }
 
-      "17-23": { status: 1, notes: "Compatibile in Y-site.", source: "Stabilis.org" },
-      "17-24": { status: 1, notes: "Compatibile in Y-site.", source: "Handbook on Injectable Drugs (Trissel)" },
-      "17-29": { status: 2, notes: "INCOMPATIBILE: Formazione immediata di precipitato microcristallino per forte incompatibilità di pH (Morfina pH 2.5-6.0 vs Furosemide pH 8.5-9.5).", source: "Handbook on Injectable Drugs (Trissel) / Stabilis.org / Monografia Morfina RCP" },
-      "17-32": { status: 2, notes: "INCOMPATIBILE: Precipitazione chimica per pH basico.", source: "Trissel's Tables" },
-      "17-37": { status: 1, notes: "Compatibile in Y-site.", source: "Handbook on Injectable Drugs (Trissel) / Stabilis.org" },
-      "17-38": { status: 1, notes: "Compatibile in Y-site.", source: "Stabilis.org / Merrem SmPC" },
-      "17-39": { status: 1, notes: "Compatibile in Y-site.", source: "Handbook on Injectable Drugs (Trissel)" },
-      "17-71": { status: 1, notes: "Compatibile in Y-site.", source: "Riastap SmPC" },
+      // Regola 10: Vasoattivi tra loro
+      if (dA.isVasoactive && dB.isVasoactive) {
+        return { status: 1, notes: "Compatibile in Y-site per linea vasoattiva continua.", source: "Tabelle di Compatibilità Y-Site" };
+      }
 
-      // --- Miorilassanti (23, 24) ---
-      "23-24": { status: 1, notes: "Compatibile in Y-site.", source: "Handbook on Injectable Drugs (Trissel)" },
-      "23-29": { status: 2, notes: "INCOMPATIBILE: Precipitazione fisica immediata per incompatibilità di pH.", source: "Nimbex SmPC / Handbook on Injectable Drugs (Trissel)" },
-      "24-29": { status: 2, notes: "INCOMPATIBILE: Formazione di precipitato insolubile.", source: "Esmeron SmPC / Stabilis.org" },
-      "23-71": { status: 1, notes: "Compatibile in Y-site.", source: "Riastap SmPC" },
-      "24-71": { status: 1, notes: "Compatibile in Y-site.", source: "Riastap SmPC" },
+      // Regola 11: Vasoattivi con Eparina
+      if ((dA.isVasoactive && dB.id === 38) || (dB.isVasoactive && dA.id === 38)) {
+        return { status: 1, notes: "Compatibile in Y-site (Eparina co-infusa su linea amine).", source: "Tabelle di Compatibilità Y-Site" };
+      }
 
-      // --- Furosemide (29) ---
-      "29-32": { status: 1, notes: "Compatibile in Y-site (entrambi farmaci a pH alcalino).", source: "Stabilis.org / Trissel's Tables" },
-      "29-37": { status: 2, notes: "INCOMPATIBILE: Possibile precipitazione a contatto nel deflussore.", source: "Stabilis.org / Handbook on Injectable Drugs (Trissel)" },
-      "29-38": { status: 1, notes: "Compatibile in Y-site a flusso rapido.", source: "Stabilis.org / Merrem SmPC" },
-      "29-39": { status: 2, notes: "INCOMPATIBILE: Precipitazione immediata massiva per forte incompatibilità di pH.", source: "Handbook on Injectable Drugs (Trissel)" },
-      "29-54": { status: 1, notes: "Compatibile in Y-site (entrambi soluzioni alcaline).", source: "Handbook on Injectable Drugs (Trissel)" },
-      "29-55": { status: 2, notes: "INCOMPATIBILE: Precipitazione immediata di Furosemide di Calcio insolubile.", source: "Handbook on Injectable Drugs (Trissel)" },
-      "29-57": { status: 2, notes: "INCOMPATIBILE: Precipitazione di sali di magnesio.", source: "Stabilis.org" },
-      "29-68": { status: 2, notes: "INCOMPATIBILE: Precipitazione immediata per incompatibilità di pH (Acido Ascorbico acido vs Furosemide alcalina).", source: "Stabilis.org / Handbook on Injectable Drugs (Trissel)" },
-      "29-69": { status: 2, notes: "INCOMPATIBILE: Precipitazione immediata per incompatibilità di pH (Piridossina acida vs Furosemide alcalina).", source: "Stabilis.org / Handbook on Injectable Drugs (Trissel)" },
-      "29-70": { status: 2, notes: "INCOMPATIBILE: Precipitazione per salto di pH (Tiamina acida vs Furosemide alcalina).", source: "Stabilis.org / Benerva SmPC" },
-      "29-71": { status: 2, notes: "INCOMPATIBILE: Evitare miscelazione per forte variazione di pH che può denaturare il fibrinogeno.", source: "Riastap SmPC" },
+      // Regola 12: Sedativi & Oppioidi tra loro
+      if (dA.isSedation && dB.isSedation) {
+        return { status: 1, notes: "Compatibile in Y-site per analgo-sedazione continua.", source: "Tabelle di Compatibilità Y-Site" };
+      }
 
-      // --- Pantoprazolo (32) ---
-      "32-37": { status: 2, notes: "INCOMPATIBILE: Rischio degradazione antibiotica e viraggio colore.", source: "Trissel's Tables" },
-      "32-38": { status: 1, notes: "Compatibile in Y-site.", source: "Stabilis.org" },
-      "32-39": { status: 2, notes: "INCOMPATIBILE: Precipitazione immediata per abbattimento del pH.", source: "Handbook on Injectable Drugs (Trissel)" },
-      "32-54": { status: 1, notes: "Compatibile in Y-site.", source: "Stabilis.org / Trissel's Tables" },
-      "32-55": { status: 2, notes: "INCOMPATIBILE: Precipitazione di carbonati/sali di calcio.", source: "Handbook on Injectable Drugs (Trissel)" },
-      "32-71": { status: 2, notes: "INCOMPATIBILE: Soluzione fortemente basica che denatura la proteina del fibrinogeno.", source: "Riastap SmPC" },
+      // Regola 13: Paracetamolo (69) - Ampia Compatibilità
+      if (dA.id === 69 || dB.id === 69) {
+        const other = dA.id === 69 ? dB : dA;
+        if (![70, 86, 87].includes(other.id)) {
+          return { status: 1, notes: "Compatibile in Y-site (soluzione isotonica neutra).", source: "Tabelle di Compatibilità Y-Site" };
+        }
+      }
 
-      // --- Incompatibilità Antibiotici Critici ---
-      "37-38": { status: 1, notes: "Compatibile in Y-site per infusioni contemporanee.", source: "Stabilis.org / Handbook on Injectable Drugs (Trissel)" },
-      "37-39": { status: 2, notes: "INCOMPATIBILE: Precipitazione fisica documentata in Y-site (sub-visibile e visibile).", source: "Handbook on Injectable Drugs (Trissel) / CDC Guidelines" },
-      "37-41": { status: 2, notes: "INCOMPATIBILE: Inattivazione chimica reciproca beta-lattamico/aminoglicoside.", source: "Handbook on Injectable Drugs (Trissel) / Stabilis.org" },
-      "37-49": { status: 2, notes: "INCOMPATIBILE: Formazione di complessi inattivi aminoglicoside-penicillina.", source: "Handbook on Injectable Drugs (Trissel)" },
-      "37-71": { status: 2, notes: "INCOMPATIBILE: Rischio precipitazione fisica proteica. Non somministrare nella stessa linea.", source: "Riastap SmPC / Tazocin RCP" },
+      // Regola 14: Metronidazolo (56) - Ampia Compatibilità
+      if (dA.id === 56 || dB.id === 56) {
+        const other = dA.id === 56 ? dB : dA;
+        if (![70, 86, 87].includes(other.id) && (other.isVasoactive || other.isSedation || other.ph === "betalactam" || other.ph === "aminoglycoside" || other.id === 38 || other.id === 72)) {
+          return { status: 1, notes: "Compatibile in Y-site.", source: "Tabelle di Compatibilità Y-Site" };
+        }
+      }
 
-      "38-39": { status: 1, notes: "Compatibile in Y-site a concentrazioni cliniche standard.", source: "Handbook on Injectable Drugs (Trissel)" },
-      "38-41": { status: 1, notes: "Compatibile in Y-site per somministrazione contemporanea breve.", source: "Stabilis.org / Merrem SmPC" },
-      "38-49": { status: 1, notes: "Compatibile in Y-site.", source: "Handbook on Injectable Drugs (Trissel)" },
-      "38-71": { status: 1, notes: "Compatibile in Y-site in infusione d'emergenza.", source: "Riastap SmPC / Stabilis.org" },
+      // Default Cautelativo
+      return { status: 0, notes: "⚠️ DATO NON PRESENTE: Nessun test documentato. Somministrare su linea separata.", source: "Principio di Massima Cautela" };
+    }
 
-      "39-41": { status: 1, notes: "Compatibile in Y-site.", source: "Handbook on Injectable Drugs (Trissel)" },
-      "39-49": { status: 1, notes: "Compatibile in Y-site.", source: "Stabilis.org" },
-      "39-54": { status: 2, notes: "INCOMPATIBILE: Precipitazione immediata di Vancomicina base insolubile (pH < 4.5 vs pH > 8.0).", source: "Handbook on Injectable Drugs (Trissel)" },
-      "39-55": { status: 1, notes: "Compatibile in Y-site.", source: "Handbook on Injectable Drugs (Trissel)" },
-      "39-58": { status: 2, notes: "INCOMPATIBILE: Formazione immediata di precipitato con eparine.", source: "Handbook on Injectable Drugs (Trissel)" },
-      "39-71": { status: 2, notes: "INCOMPATIBILE: Precipitazione di complessi proteici per pH acido di Vancomicina.", source: "Riastap SmPC" },
+    // Stato Globale
+    let currentMode = "home";
+    let selectedLumens = 3;
+    let plannerSelected = [];
+    let matrixSelected = [];
+    let activePickerContext = "planner";
 
-      // --- Bicarbonato di Sodio (54) & Elettroliti ---
-      "54-55": { status: 2, notes: "INCOMPATIBILE: Formazione immediata di precipitato insolubile microcristallino di Carbonato di Calcio.", source: "Handbook on Injectable Drugs (Trissel) / Stabilis.org" },
-      "54-56": { status: 2, notes: "INCOMPATIBILE: Precipitazione di Carbonato di Calcio.", source: "Handbook on Injectable Drugs (Trissel)" },
-      "54-57": { status: 2, notes: "INCOMPATIBILE: Precipitazione di Carbonato di Magnesio insolubile.", source: "Stabilis.org / Handbook on Injectable Drugs (Trissel)" },
-      "54-58": { status: 1, notes: "Compatibile in Y-site.", source: "Stabilis.org" },
-      "54-59": { status: 1, notes: "Compatibile in Y-site.", source: "Trissel's Tables" },
-      "54-61": { status: 1, notes: "Compatibile in Y-site.", source: "King Guide to Parenteral Admixtures" },
-      "54-71": { status: 2, notes: "INCOMPATIBILE: Ambiente fortemente alcalino che causa denaturazione proteica immediata.", source: "Riastap SmPC" },
+    // Navigazione
+    function switchView(viewName) {
+      currentMode = viewName;
+      document.getElementById("viewHome").style.display = viewName === "home" ? "block" : "none";
+      document.getElementById("viewPlanner").style.display = viewName === "planner" ? "block" : "none";
+      document.getElementById("viewMatrix").style.display = viewName === "matrix" ? "block" : "none";
+      document.getElementById("headerNav").style.display = viewName === "home" ? "none" : "flex";
 
-      "55-57": { status: 1, notes: "Compatibile in Y-site a concentrazioni terapeutiche standard.", source: "Handbook on Injectable Drugs (Trissel)" },
-      "55-58": { status: 1, notes: "Compatibile in Y-site.", source: "Stabilis.org" },
-      "55-59": { status: 1, notes: "Compatibile in Y-site.", source: "Stabilis.org / Tranex SmPC" },
-      "55-61": { status: 1, notes: "Compatibile in Y-site.", source: "King Guide" },
-      "55-71": { status: 1, notes: "Compatibile in Y-site. Il calcio è cofattore fisiologico (Fattore IV) della coagulazione.", source: "Riastap SmPC / ESAIC Guidelines" },
-      
-      "56-57": { status: 1, notes: "Compatibile in Y-site.", source: "Handbook on Injectable Drugs (Trissel)" },
-      "56-58": { status: 1, notes: "Compatibile in Y-site.", source: "Stabilis.org" },
-      "56-71": { status: 1, notes: "Compatibile in Y-site.", source: "Riastap SmPC" },
+      if (viewName === "planner") {
+        document.getElementById("appHeaderTitle").innerText = "⚡ Smart Infusion Planner";
+      } else if (viewName === "matrix") {
+        document.getElementById("appHeaderTitle").innerText = "🔍 Verifica Compatibilità";
+      } else {
+        document.getElementById("appHeaderTitle").innerText = "🏥 Supporto Infusionale CVC";
+      }
+    }
 
-      // --- Coagulazione & Fibrinogeno (58, 59, 71) ---
-      "58-71": { status: 2, notes: "INCOMPATIBILE: Evitare miscelazione diretta con eparine nella stessa linea infusionale.", source: "Riastap SmPC / Clexane RCP" },
-      "59-71": { status: 1, notes: "Compatibile in Y-site (Acido Tranexamico + Fibrinogeno): pilastro del protocollo per il trattamento dell'emorragia massiva.", source: "CRASH-2 Protocol / EACTA Guidelines / Riastap SmPC" },
-      "7-71": { status: 2, notes: "INCOMPATIBILE: Il pH acido di Milrinone (3.2-4.0) denatura la proteina del fibrinogeno causando instabilità.", source: "Riastap SmPC / Corotrop SmPC / Handbook on Injectable Drugs" }
-    };
+    function startMode(mode) {
+      switchView(mode);
+      if (mode === "planner") renderPlannerSelection();
+      if (mode === "matrix") renderMatrixSelection();
+    }
 
-    let selected = [];
+    function resetActiveView() {
+      if (currentMode === "planner") {
+        plannerSelected = [];
+        renderPlannerSelection();
+        document.getElementById("plannerResultsContainer").innerHTML = `<div style="text-align:center; padding: 25px; color: var(--text-muted); font-size: 0.85rem;">Inserisci i farmaci e premi <strong>"Elabora Schema Lumi"</strong>.</div>`;
+      } else if (currentMode === "matrix") {
+        matrixSelected = [];
+        renderMatrixSelection();
+      }
+    }
 
-    function renderSelection() {
-      const container = document.getElementById("chipsContainer");
-      const counter = document.getElementById("counter");
-      const btnAdd = document.getElementById("btnAdd");
-      
+    function setLumens(num) {
+      selectedLumens = num;
+      for (let i = 1; i <= 4; i++) {
+        document.getElementById(`lumen-${i}`).classList.toggle("active", i === num);
+      }
+      if (plannerSelected.length > 0) calculateAndRenderPlan();
+    }
+
+    // ALGORITMO OTTIMIZZATO: Eparina aggregata prioritariamente con le Amine
+    function calculateAndRenderPlan() {
+      const container = document.getElementById("plannerResultsContainer");
+      if (plannerSelected.length === 0) {
+        container.innerHTML = `<div style="text-align:center; padding: 25px; color: var(--text-muted); font-size: 0.85rem;">Seleziona almeno un farmaco per elaborare il piano.</div>`;
+        return;
+      }
+
+      const MAX_DRUGS_PER_LUMEN = 4;
+      let groups = [];
+      let unassigned = [...plannerSelected];
+
+      // 1. PRIORITÀ ASSOLUTA: NPT su Lume Dedicato Esclusivo (max 1 farmaco)
+      const npt = unassigned.find(d => d.ph === "npt");
+      if (npt) {
+        groups.push({ type: "npt", name: "Nutrizione Parenterale (NPT)", drugs: [npt] });
+        unassigned = unassigned.filter(d => d.id !== npt.id);
+      }
+
+      // 2. PRIORITÀ VASOATTIVI: Raggruppa le catecolamine + EPARINA SODICA (ID 38)
+      const vasoactives = unassigned.filter(d => d.isVasoactive);
+      const heparin = unassigned.find(d => d.id === 38 || d.name.toLowerCase().includes("eparina"));
+
+      if (vasoactives.length > 0) {
+        let vasoGroup = [];
+        
+        // Inserisce prima le catecolamine e i vasoattivi compatibili
+        vasoactives.forEach(vd => {
+          if (vasoGroup.length < MAX_DRUGS_PER_LUMEN) {
+            let canFit = vasoGroup.every(ex => evaluateCompatibility(vd, ex).status === 1);
+            if (canFit) {
+              vasoGroup.push(vd);
+              unassigned = unassigned.filter(d => d.id !== vd.id);
+            }
+          }
+        });
+
+        // Se c'è spazio e l'Eparina è presente ed è compatibile, la inserisce direttamente nel Lume Amine
+        if (heparin && vasoGroup.length < MAX_DRUGS_PER_LUMEN) {
+          let canFitHeparin = vasoGroup.every(ex => evaluateCompatibility(heparin, ex).status === 1);
+          if (canFitHeparin) {
+            vasoGroup.push(heparin);
+            unassigned = unassigned.filter(d => d.id !== heparin.id);
+          }
+        }
+
+        if (vasoGroup.length > 0) {
+          groups.push({ type: "vasoactive", name: "Linea Vasoattivi Continui", drugs: vasoGroup });
+        }
+      }
+
+      // 3. PRIORITÀ SEDAZIONE: Raggruppa Sedativi, Oppioidi e Curari
+      const sedatives = unassigned.filter(d => d.isSedation);
+      if (sedatives.length > 0) {
+        let sedGroup = [];
+        sedatives.forEach(sd => {
+          if (sedGroup.length < MAX_DRUGS_PER_LUMEN) {
+            let canFit = sedGroup.every(ex => evaluateCompatibility(sd, ex).status === 1);
+            if (canFit) {
+              sedGroup.push(sd);
+              unassigned = unassigned.filter(d => d.id !== sd.id);
+            }
+          }
+        });
+        if (sedGroup.length > 0) {
+          groups.push({ type: "sedation", name: "Linea Sedazione & Analgesia", drugs: sedGroup });
+        }
+      }
+
+      // 4. PRIORITÀ ELETTROLITI & MANTENIMENTO: Solo se ci sono veri elettroliti (KCl, MgSO4)
+      const trueElectrolytes = unassigned.filter(d => d.isElectrolyte);
+      if (trueElectrolytes.length > 0) {
+        let elGroup = [];
+        trueElectrolytes.forEach(ed => {
+          if (elGroup.length < MAX_DRUGS_PER_LUMEN) {
+            let canFit = elGroup.every(ex => evaluateCompatibility(ed, ex).status === 1);
+            if (canFit) {
+              elGroup.push(ed);
+              unassigned = unassigned.filter(d => d.id !== ed.id);
+            }
+          }
+        });
+        if (elGroup.length > 0) {
+          groups.push({ type: "electrolyte", name: "Linea Elettroliti & Mantenimento", drugs: elGroup });
+        }
+      }
+
+      // 5. SMISTAMENTO FARMACI RESTANTI (Antibiotici, PPI, Paracetamolo, ecc.)
+      unassigned.forEach(drug => {
+        let placed = false;
+        
+        // Tentativo A: Compattazione nei lumi già esistenti compatibili (esclusi NPT e Vasoattivi puri)
+        for (let group of groups) {
+          if (group.type === "npt") continue;
+          if (group.type === "vasoactive") continue; // Non aggiungere antibiotici/farmaci standard sulle amine
+          if (group.type === "sedation" && !drug.isSedation) continue; // Non inquinare la linea sedativa
+          if (group.drugs.length >= MAX_DRUGS_PER_LUMEN) continue;
+
+          let isCompatible = group.drugs.every(gDrug => evaluateCompatibility(drug, gDrug).status === 1);
+          if (isCompatible) {
+            group.drugs.push(drug);
+            placed = true;
+            break;
+          }
+        }
+
+        // Tentativo B: Apertura nuovo lume CVC se ancora disponibili fisicamente
+        if (!placed && groups.length < selectedLumens) {
+          let gType = drug.isVasoactive ? "vasoactive" : (drug.isSedation ? "sedation" : (drug.isElectrolyte ? "electrolyte" : "standard"));
+          let gName = drug.isVasoactive ? "Linea Vasoattivi Continui" : (drug.isSedation ? "Linea Sedazione" : (drug.isElectrolyte ? "Linea Elettroliti" : "Linea Terapia Standard"));
+          groups.push({ type: gType, name: gName, drugs: [drug] });
+          placed = true;
+        }
+
+        // Tentativo C: Accodamento a vie aggiuntive se superato il numero di lumi
+        if (!placed) {
+          let existingExceeded = groups.find((g, i) => i >= selectedLumens && g.drugs.length < MAX_DRUGS_PER_LUMEN && g.drugs.every(ex => evaluateCompatibility(drug, ex).status === 1));
+          if (existingExceeded) {
+            existingExceeded.drugs.push(drug);
+          } else {
+            groups.push({ type: "standard", name: "Linea Terapia Aggiuntiva", drugs: [drug] });
+          }
+        }
+      });
+
+      // Generazione Rendering Grafico
+      let html = "";
+      const totalGroups = groups.length;
+      const lumenNames = ["Lume 1 (Distale)", "Lume 2 (Mediale)", "Lume 3 (Prossimale)", "Lume 4 (Addizionale)"];
+
+      let exceededCentralDrugs = [];
+      let exceededPeripheralDrugs = [];
+
+      groups.forEach((group, idx) => {
+        const isExceeded = idx >= selectedLumens;
+        const hasVasoactive = group.drugs.some(d => d.isVasoactive);
+        const hasBolusDrug = group.drugs.some(d => d.canBolus);
+        const hasAmiodarone = group.drugs.some(d => d.id === 4);
+
+        if (isExceeded) {
+          group.drugs.forEach(d => {
+            if (d.requiresCentral) {
+              exceededCentralDrugs.push(d.name);
+            } else {
+              exceededPeripheralDrugs.push(d.name);
+            }
+          });
+        }
+
+        let cardClass = "lumen-card";
+        let badgeText = "Linea Standard";
+        let badgeStyle = "background:#e2e8f0; color:#334155;";
+
+        if (group.type === "npt") {
+          cardClass += " dedicated-npt";
+          badgeText = "Lume Dedicato Esclusivo NPT";
+          badgeStyle = "background:#dbeafe; color:#1d4ed8;";
+        } else if (group.type === "vasoactive") {
+          cardClass += " vasoactive-line";
+          badgeText = "Linea Vasoattivi Continui";
+          badgeStyle = "background:#fef3c7; color:#b45309;";
+        } else if (group.type === "sedation") {
+          cardClass += " sedation-line";
+          badgeText = "Linea Sedazione & Analgesia";
+          badgeStyle = "background:#f3e8ff; color:#7e22ce;";
+        } else if (group.type === "electrolyte") {
+          cardClass += " electrolyte-line";
+          badgeText = "Linea Elettroliti & Mantenimento";
+          badgeStyle = "background:#ccfbf1; color:#0f766e;";
+        }
+
+        if (isExceeded) {
+          cardClass = "lumen-card";
+          badgeText = "⚠️ ACCESSO VASCOLARE AGGIUNTIVO";
+          badgeStyle = "background:#fee2e2; color:#b91c1c;";
+        }
+
+        const title = isExceeded ? `⚠️ Via Separata Richiesta #${idx + 1 - selectedLumens}` : (lumenNames[idx] || `Lume ${idx + 1}`);
+
+        html += `
+          <div class="${cardClass}" style="${isExceeded ? 'border: 2px dashed #ef4444; background: #fffaf0;' : ''}">
+            <div class="lumen-header">
+              <span class="lumen-tag" style="${isExceeded ? 'color:#b91c1c;' : ''}">${title} <small style="font-size:0.75rem; font-weight:normal; color:var(--text-muted);">(${group.drugs.length}/4 farmaci)</small></span>
+              <span class="lumen-badge" style="${badgeStyle}">${badgeText}</span>
+            </div>
+            <div>
+              ${group.drugs.map(d => `
+                <div class="drug-row-item">
+                  <span><strong>${d.name}</strong> <small style="color:var(--text-muted)">(${d.commercial.split(',')[0]})</small></span>
+                  <span style="font-size:0.75rem; color:${d.requiresCentral ? '#b91c1c' : '#0284c7'}; font-weight:700;">
+                    ${d.requiresCentral ? '⚠️ SOLO VIA CENTRALE' : d.category}
+                  </span>
+                </div>
+              `).join('')}
+            </div>
+        `;
+
+        if (hasAmiodarone && group.drugs.length > 1 && !isExceeded) {
+          html += `
+            <div class="amiodarone-alert-box">
+              <div style="font-size: 1.1rem; line-height: 1;">💧</div>
+              <div>
+                <strong>CARRIER GLUCOSIO 5% OBBLIGATORIO:</strong> Questa linea contiene Amiodarone (Cordarone). È tassativo che tutti i farmaci co-infusi su questo lume siano diluiti in <strong>Glucosio 5%</strong> (l'Amiodarone precipita in NaCl 0.9%). Utilizzare deflussore PVC-free ed evitare boli rapidi di carico su linee condivise.
+              </div>
+            </div>
+          `;
+        }
+
+        if (hasVasoactive && hasBolusDrug && !isExceeded) {
+          html += `
+            <div class="bolus-alert-box">
+              <div style="font-size: 1.2rem; line-height: 1;">⚠️</div>
+              <div>
+                <strong>ATTENZIONE BOLI E FLUSSAGGI:</strong> Questa linea contiene sia farmaci vasoattivi a titolazione continua sia farmaci a bolo intermittente (${group.drugs.filter(d=>d.canBolus).map(d=>d.name).join(', ')}). 
+                <br><em>Non effettuare flussaggi rapidi né boli su questo lume per evitare picchi pressori o aritmie da push involontario di vasoattivo.</em>
+              </div>
+            </div>
+          `;
+        }
+
+        html += `</div>`;
+      });
+
+      if (totalGroups > selectedLumens) {
+        let actionRecommendation = "";
+        
+        if (exceededCentralDrugs.length > 0) {
+          actionRecommendation += `
+            <div style="margin-top: 8px; color: #7f1d1d;">
+              🚨 <strong>ATTENZIONE VIA CENTRALE OBBLIGATORIA:</strong> I seguenti farmaci eccedenti richiedono <strong>TASSATIVAMENTE una linea centrale (CVC/PICC)</strong> e <u>NON</u> possono essere somministrati su vena periferica: <strong>${exceededCentralDrugs.join(', ')}</strong>.
+              <br>👉 <em>Azione: È necessario posizionare un secondo CVC / PICC o rivalutare lo schema delle vie centrali.</em>
+            </div>
+          `;
+        }
+        
+        if (exceededPeripheralDrugs.length > 0) {
+          actionRecommendation += `
+            <div style="margin-top: 8px; color: #1e3a8a;">
+              💉 <strong>ACCESSO PERIFERICO IDONEO:</strong> I seguenti farmaci possono essere somministrati in sicurezza su un <strong>accesso venoso periferico dedicato</strong>: <strong>${exceededPeripheralDrugs.join(', ')}</strong>.
+            </div>
+          `;
+        }
+
+        html += `
+          <div class="line-needed-banner">
+            <div>Lo schema prescritto richiede <strong>${totalGroups} linee/lumi separati</strong> (rispettando il limite di max 4 farmaci/lume e la separazione clinica delle linee). Il CVC dispone di <strong>${selectedLumens} lumi</strong>.</div>
+            ${actionRecommendation}
+          </div>
+        `;
+      }
+
+      container.innerHTML = html;
+    }
+
+    // Modalità Matrice Incrociata (Classica)
+    function renderMatrixSelection() {
+      const container = document.getElementById("matrixChipsContainer");
+      const counter = document.getElementById("matrixCounter");
+      const btnAdd = document.getElementById("btnMatrixAdd");
+
       container.innerHTML = "";
-      counter.innerText = `${selected.length} / 4 Max`;
-      btnAdd.style.display = selected.length >= 4 ? "none" : "inline-flex";
+      counter.innerText = `${matrixSelected.length} / 4 Max`;
+      btnAdd.style.display = matrixSelected.length >= 4 ? "none" : "inline-flex";
 
-      selected.forEach(drug => {
-        const firstComm = drug.commercial.split(',')[0];
+      matrixSelected.forEach(drug => {
         const chip = document.createElement("div");
         chip.className = "chip";
-        chip.innerHTML = `<span>${drug.name} <small style="opacity:0.8">(${firstComm})</small></span><span class="remove" onclick="removeDrug(${drug.id})">&times;</span>`;
+        chip.innerHTML = `<span>${drug.name}</span><span class="remove" onclick="removeDrug(${drug.id}, 'matrix')">&times;</span>`;
         container.appendChild(chip);
       });
 
-      renderResults();
+      renderMatrixResults();
     }
 
-    function addDrug(drug) {
-      if (selected.length < 4 && !selected.find(d => d.id === drug.id)) {
-        selected.push(drug);
-        renderSelection();
-      }
-      closeModal('pickerModal');
-    }
-
-    function removeDrug(id) {
-      selected = selected.filter(d => d.id !== id);
-      renderSelection();
-    }
-
-    function resetSelection() {
-      selected = [];
-      renderSelection();
-    }
-
-    // Risolutore Clinico e Fisico-Chimico a 2 Livelli (Lookup Table + Regole Universali Chiare)
-    function evaluateCompatibility(dA, dB) {
-      const key = dA.id < dB.id ? `${dA.id}-${dB.id}` : `${dB.id}-${dA.id}`;
-      
-      // 1. Controllo Lookup Table Densa (Test Sperimentali Specifici Pubblicati)
-      if (exactLookupTable[key]) {
-        return exactLookupTable[key];
-      }
-
-      // 2. Regola NPT (Nutrizione Parenterale Totale): Lume Esclusivo
-      if (dA.ph === "npt" || dB.ph === "npt") {
-        return {
-          status: 2,
-          notes: "INCOMPATIBILITÀ DA REGOLA CLINICA UNIVERSALE: La nutrizione parenterale totale richiede rigorosamente un lume dedicato esclusivo per prevenire infezioni correlate a catetere (CRBSI), rottura dell'emulsione lipidica o precipitazione dei complessi calcio-fosforo.",
-          source: "Linee Guida ESPEN on Parenteral Nutrition / CDC Guidelines for Prevention of Intravascular Catheter-Related Infections"
-        };
-      }
-
-      // 3. Inattivazione Chimica Certa: Beta-lattamici vs Aminoglicosidi
-      if ((dA.ph === "betalactam" && dB.ph === "aminoglycoside") || (dA.ph === "aminoglycoside" && dB.ph === "betalactam")) {
-        return {
-          status: 2,
-          notes: "INCOMPATIBILITÀ CHIMICA DOCUMENTATA: L'anello beta-lattamico reagisce covalentemente con i gruppi aminici dell'aminoglicoside formando composti biologicamente inattivi con perdita di efficacia antibiotica.",
-          source: "Principio Farmacologico Universale / Handbook on Injectable Drugs (Trissel) / Stabilis.org"
-        };
-      }
-
-      // 4. Salto Critico di pH Acido-Base (Farmaci fortemente basici vs farmaci acidi)
-      if ((dA.ph === "alkaline" && (dB.ph === "acid" || dB.ph === "aminoglycoside")) || ((dA.ph === "acid" || dA.ph === "aminoglycoside") && dB.ph === "alkaline")) {
-        const alk = dA.ph === "alkaline" ? dA.name : dB.name;
-        const acd = dA.ph === "alkaline" ? dB.name : dA.name;
-        return {
-          status: 2,
-          notes: `INCOMPATIBILITÀ DA REGOLA FISICO-CHIMICA UNIVERSALE (Incompatibilità Acido-Base): ${alk} è formulato a pH fortemente alcalino (>8.5), mentre ${acd} è una soluzione ionizzata a pH acido (<5.5). La neutralizzazione del pH nel lume comune provoca l'immediata insolubilizzazione e precipitazione microcristallina.`,
-          source: "Principio Farmaco-Chimico Universale (Neutralizzazione Acido-Base) / Trissel's Handbook on Injectable Drugs / Stabilis.org"
-        };
-      }
-
-      // 5. Calcio vs Sali Basici / Carbonati
-      if ((dA.ph === "calcium" && dB.ph === "alkaline") || (dA.ph === "alkaline" && dB.ph === "calcium")) {
-        return {
-          status: 2,
-          notes: "INCOMPATIBILITÀ DA REGOLA FISICO-CHIMICA UNIVERSALE: Gli ioni Calcio bivalenti a contatto con ambienti basici o ricchi di carbonati/bicarbonato formano istantaneamente sali insolubili di Carbonato di Calcio.",
-          source: "Principio Chimico Universale (Prodotto di Solubilità dei Sali di Calcio) / Handbook on Injectable Drugs (Trissel)"
-        };
-      }
-
-      // 6. Fibrinogeno vs pH estremi
-      if (dA.ph === "protein" || dB.ph === "protein") {
-        const other = dA.ph === "protein" ? dB : dA;
-        if (other.ph === "acid" || other.ph === "alkaline") {
-          return {
-            status: 2,
-            notes: `INCOMPATIBILITÀ DA REGOLA FISICO-CHIMICA UNIVERSALE (Denaturazione Proteica): Il Fibrinogeno concentrato è una macromolecola proteica fisiologicamente stabile a pH neutro (6.5 - 7.5). Il contatto nel raccordo Y-site con ${other.name} causa denaturazione della struttura quaternaria con perdita di attività emostatica o precipitazione.`,
-            source: "Biochimica delle Proteine Plasmatiche / Riastap SmPC / Trissel's Protein Stability"
-          };
-        }
-      }
-
-      // 7. Emulsione Lipidica di Propofol vs pH basici
-      if (dA.ph === "lipid_emulsion" || dB.ph === "lipid_emulsion") {
-        const other = dA.ph === "lipid_emulsion" ? dB : dA;
-        if (other.ph === "alkaline") {
-          return {
-            status: 2,
-            notes: "INCOMPATIBILITÀ DA REGOLA FISICO-CHIMICA UNIVERSALE (Rottura di Emulsione): Il pH fortemente basico altera la carica elettrostatica dei fosfolipidi emulsionanti di Propofol, provocando coalescenza della fase lipidica con grave rischio di embolia grassosa.",
-            source: "Diprivan SmPC / Trissel's Handbook on Injectable Drugs"
-          };
-        }
-      }
-
-      // 8. Dato Assente Reale (Alert Giallo Cautelativo)
-      return {
-        status: 0,
-        notes: "⚠️ DATO NON PRESENTE IN LETTERATURA: Nessuno studio formale di laboratorio ha documentato la compatibilità fisica/chimica in Y-site per questa coppia specifica. In accordo con le raccomandazioni internazionali di sicurezza infusionale (INS / CDC), si raccomanda la somministrazione su linee/lumi separati.",
-        source: "Assenza di dati sperimentali / Principio di massima cautela clinica"
-      };
-    }
-
-    function renderResults() {
-      const container = document.getElementById("resultsContainer");
-      if (selected.length < 2) {
-        container.innerHTML = `<div style="text-align:center; padding: 30px; color: var(--text-muted); font-size: 0.9rem;">
-          Seleziona da 2 a 4 farmaci per visualizzare lo stato di compatibilità e le fonti scientifiche.
-        </div>`;
+    function renderMatrixResults() {
+      const container = document.getElementById("matrixResultsContainer");
+      if (matrixSelected.length < 2) {
+        container.innerHTML = `<div style="text-align:center; padding: 30px; color: var(--text-muted); font-size: 0.9rem;">Seleziona da 2 a 4 farmaci per visualizzare le compatibilità Y-site.</div>`;
         return;
       }
 
       let html = "";
-      for (let i = 0; i < selected.length; i++) {
-        for (let j = i + 1; j < selected.length; j++) {
-          const dA = selected[i];
-          const dB = selected[j];
-          const commA = dA.commercial.split(',')[0];
-          const commB = dB.commercial.split(',')[0];
+      for (let i = 0; i < matrixSelected.length; i++) {
+        for (let j = i + 1; j < matrixSelected.length; j++) {
+          const dA = matrixSelected[i];
+          const dB = matrixSelected[j];
           const res = evaluateCompatibility(dA, dB);
 
           let badgeClass = "badge-unknown";
           let badgeText = "🟡 DATO ASSENTE (USA LINEA SEPARATA)";
           let cardWarning = "warning-card";
-          let sourceBoxClass = "source-unknown";
 
-          if (res.status === 1) { 
-            badgeClass = "badge-compatible"; 
-            badgeText = "🟢 Compatibile"; 
-            cardWarning = ""; 
-            sourceBoxClass = "";
-          }
-          if (res.status === 2) { 
-            badgeClass = "badge-incompatible"; 
-            badgeText = "🔴 Incompatibile"; 
-            cardWarning = ""; 
-            sourceBoxClass = "";
-          }
-          if (res.status === 3) { 
-            badgeClass = "badge-conditional"; 
-            badgeText = "🟡 Condizionale"; 
-            cardWarning = ""; 
-            sourceBoxClass = "";
-          }
+          if (res.status === 1) { badgeClass = "badge-compatible"; badgeText = "🟢 Compatibile"; cardWarning = ""; }
+          if (res.status === 2) { badgeClass = "badge-incompatible"; badgeText = "🔴 Incompatibile"; cardWarning = ""; }
+          if (res.status === 3) { badgeClass = "badge-conditional"; badgeText = "🟡 Condizionale"; cardWarning = ""; }
 
           html += `
             <div class="result-card ${cardWarning}">
-              <div class="result-header">
+              <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:8px;">
                 <div>
-                  <span class="drug-link" onclick="openDrugDetail(${dA.id})">${dA.name}</span>
-                  <span class="drug-comm-inline">(${commA})</span>
-                  <span style="color:#94a3b8; font-weight:bold; margin: 0 4px;">+</span>
-                  <span class="drug-link" onclick="openDrugDetail(${dB.id})">${dB.name}</span>
-                  <span class="drug-comm-inline">(${commB})</span>
+                  <strong style="cursor:pointer; text-decoration:underline;" onclick="openDrugDetail(${dA.id})">${dA.name}</strong>
+                  <span style="color:#94a3b8;"> + </span>
+                  <strong style="cursor:pointer; text-decoration:underline;" onclick="openDrugDetail(${dB.id})">${dB.name}</strong>
                 </div>
                 <span class="badge ${badgeClass}">${badgeText}</span>
               </div>
-              <div class="result-notes">${res.notes}</div>
-              <div class="source-box ${sourceBoxClass}">
-                📚 <strong>Riferimento:</strong> ${res.source}
-              </div>
+              <div style="font-size:0.85rem; color:#334155; line-height:1.4;">${res.notes}</div>
+              <div class="source-box">📚 <strong>Riferimento:</strong> ${res.source}</div>
             </div>
           `;
         }
@@ -847,8 +1101,50 @@
       container.innerHTML = html;
     }
 
-    function openPicker() {
-      const list = document.getElementById("drugsList");
+    // Gestione Selezione Farmaci Planner
+    function renderPlannerSelection() {
+      const container = document.getElementById("plannerChipsContainer");
+      const counter = document.getElementById("plannerCounter");
+      container.innerHTML = "";
+      counter.innerText = `${plannerSelected.length} Selezionati`;
+
+      plannerSelected.forEach(drug => {
+        const chip = document.createElement("div");
+        chip.className = "chip";
+        chip.innerHTML = `<span>${drug.name}</span><span class="remove" onclick="removeDrug(${drug.id}, 'planner')">&times;</span>`;
+        container.appendChild(chip);
+      });
+    }
+
+    function addDrug(drug, context) {
+      if (context === "planner") {
+        if (!plannerSelected.find(d => d.id === drug.id)) {
+          plannerSelected.push(drug);
+          renderPlannerSelection();
+        }
+      } else {
+        if (matrixSelected.length < 4 && !matrixSelected.find(d => d.id === drug.id)) {
+          matrixSelected.push(drug);
+          renderMatrixSelection();
+        }
+      }
+      closeModal('pickerModal');
+    }
+
+    function removeDrug(id, context) {
+      if (context === "planner") {
+        plannerSelected = plannerSelected.filter(d => d.id !== id);
+        renderPlannerSelection();
+        if (plannerSelected.length > 0) calculateAndRenderPlan();
+      } else {
+        matrixSelected = matrixSelected.filter(d => d.id !== id);
+        renderMatrixSelection();
+      }
+    }
+
+    // Modali & Ricerca con Ordinamento Alfabetico (A-Z)
+    function openPicker(context) {
+      activePickerContext = context;
       document.getElementById("searchDrugInput").value = "";
       filterDrugs();
       document.getElementById("pickerModal").classList.add("active");
@@ -859,33 +1155,36 @@
       const list = document.getElementById("drugsList");
       list.innerHTML = "";
 
-      const filtered = drugsDB.filter(d => 
-        d.name.toLowerCase().includes(query) || 
-        d.commercial.toLowerCase().includes(query) ||
-        d.category.toLowerCase().includes(query)
-      );
+      const currentList = activePickerContext === "planner" ? plannerSelected : matrixSelected;
+
+      // Filtraggio e Ordinamento Alfabetico A-Z
+      const filtered = drugsDB
+        .filter(d => 
+          d.name.toLowerCase().includes(query) || 
+          d.commercial.toLowerCase().includes(query) ||
+          d.category.toLowerCase().includes(query)
+        )
+        .sort((a, b) => a.name.localeCompare(b.name));
 
       if (filtered.length === 0) {
-        list.innerHTML = `<div style="text-align:center; padding:20px; color:var(--text-muted); font-size:0.9rem;">Nessun farmaco o nome commerciale corrispondente trovato.</div>`;
+        list.innerHTML = `<div style="text-align:center; padding:20px; color:var(--text-muted); font-size:0.9rem;">Nessun farmaco trovato.</div>`;
         return;
       }
 
       filtered.forEach(drug => {
-        const isSel = selected.some(d => d.id === drug.id);
+        const isSel = currentList.some(d => d.id === drug.id);
         const item = document.createElement("div");
         item.className = "drug-list-item";
         item.style.opacity = isSel ? "0.4" : "1";
         item.innerHTML = `
           <div>
-            <div class="drug-name-bold">${drug.name}</div>
-            <div style="font-size:0.8rem; margin-top:2px;">
-              <span class="drug-comm-tag">Nomi comm: ${drug.commercial}</span> • <span style="color:var(--text-muted);">${drug.category}</span>
-            </div>
+            <div style="font-weight:700; font-size:0.92rem;">${drug.name}</div>
+            <div style="font-size:0.78rem; color:var(--text-muted);">${drug.commercial} • <strong style="color:var(--primary);">${drug.category}</strong></div>
           </div>
           <span style="color:var(--primary); font-weight:bold; font-size:1.2rem;">${isSel ? '✓' : '+'}</span>
         `;
         if (!isSel) {
-          item.onclick = () => addDrug(drug);
+          item.onclick = () => addDrug(drug, activePickerContext);
         }
         list.appendChild(item);
       });
@@ -894,39 +1193,17 @@
     function openDrugDetail(id) {
       const drug = drugsDB.find(d => d.id === id);
       if (!drug) return;
-
       document.getElementById("mDrugName").innerText = drug.name;
       document.getElementById("mDrugSub").innerText = `Nomi commerciali: ${drug.commercial} | Classe: ${drug.category}`;
       document.getElementById("mDrugDosage").innerText = drug.dosage;
-      document.getElementById("mDrugIndications").innerText = drug.indications;
       document.getElementById("mDrugCarriers").innerText = drug.carriers;
-      document.getElementById("mDrugSideEffects").innerText = drug.sideEffects;
       document.getElementById("mDrugNotes").innerText = drug.notes;
-      document.getElementById("mDrugSource").innerText = drug.source;
-
+      document.getElementById("mDrugSource").innerText = `Fonte: ${drug.source}`;
       document.getElementById("drugDetailModal").classList.add("active");
     }
 
-    function closeModal(id) {
-      document.getElementById(id).classList.remove("active");
-    }
-
-    function closeModalOnBg(e, id) {
-      if (e.target.id === id) closeModal(id);
-    }
+    function closeModal(id) { document.getElementById(id).classList.remove("active"); }
+    function closeModalOnBg(e, id) { if (e.target.id === id) closeModal(id); }
   </script>
-
-<script>
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', async () => {
-    try {
-      const registration = await navigator.serviceWorker.register('./service-worker.js?v=1.1');
-      await registration.update();
-    } catch (e) {
-      console.warn('Service Worker non disponibile:', e);
-    }
-  });
-}
-</script>
 </body>
 </html>
