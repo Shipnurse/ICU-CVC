@@ -8,6 +8,9 @@
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="theme-color" content="#0f766e">
   <title>Supporto Infusionale CVC</title>
+  <link rel="manifest" href="./manifest.json">
+  <link rel="apple-touch-icon" href="./icon-192.png">
+  <link rel="icon" type="image/png" href="./icon-192.png">
   <style>
     :root {
       --primary: #0f766e;
@@ -1204,6 +1207,17 @@
 
     function closeModal(id) { document.getElementById(id).classList.remove("active"); }
     function closeModalOnBg(e, id) { if (e.target.id === id) closeModal(id); }
+  </script>
+
+  <!-- Registrazione Service Worker per PWA Offline -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./service-worker.js')
+          .then(reg => console.log('PWA Service Worker registrato con successo:', reg.scope))
+          .catch(err => console.log('Errore registrazione Service Worker:', err));
+      });
+    }
   </script>
 </body>
 </html>
