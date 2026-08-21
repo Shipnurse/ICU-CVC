@@ -2,12 +2,7 @@
 <html lang="it">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <meta name="theme-color" content="#0f766e">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="default">
-  <meta name="apple-mobile-web-app-title" content="ICU CVC">
-  <link rel="manifest" href="manifest.json">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ICU CVC Compatibility - Full Clinical Matrix</title>
   <style>
     :root {
@@ -252,6 +247,14 @@
     .drug-name-bold { font-weight: 700; font-size: 0.95rem; color: var(--text); }
     .drug-comm-tag { color: #0284c7; font-weight: 600; }
   </style>
+
+  <meta name="theme-color" content="#0f766e">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="ICU CVC">
+  <link rel="manifest" href="./manifest.json">
+  <link rel="apple-touch-icon" href="./icon-192.png">
 </head>
 <body>
 
@@ -910,8 +913,18 @@
       if (e.target.id === id) closeModal(id);
     }
   </script>
+
 <script>
-if ('serviceWorker' in navigator) { window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(console.error)); }
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', async () => {
+    try {
+      const registration = await navigator.serviceWorker.register('./service-worker.js');
+      await registration.update();
+    } catch (e) {
+      console.warn('Service Worker non disponibile:', e);
+    }
+  });
+}
 </script>
 </body>
 </html>

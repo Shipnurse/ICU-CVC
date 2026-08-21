@@ -1,14 +1,15 @@
 {
-  "name": "ICU CVC Compatibility",
+  "name": "ICU CVC",
   "short_name": "ICU CVC",
-  "description": "Decision support per la compatibilità Y-site dei farmaci in terapia intensiva.",
-  "start_url": "./app_cvc.html",
+  "description": "Strumento di supporto decisionale per la compatibilità dei farmaci in CVC.",
+  "start_url": "./",
+  "scope": "./",
   "display": "standalone",
+  "orientation": "portrait",
   "background_color": "#f8fafc",
   "theme_color": "#0f766e",
-  "orientation": "portrait",
   "icons": [
-    {"src":"icon-192.png","sizes":"192x192","type":"image/png"},
-    {"src":"icon-512.png","sizes":"512x512","type":"image/png"}
+    {"src":"./icon-192.png","sizes":"192x192","type":"image/png","purpose":"any maskable"},
+    {"src":"./icon-512.png","sizes":"512x512","type":"image/png","purpose":"any maskable"}
   ]
 }
