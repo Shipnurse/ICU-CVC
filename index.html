@@ -652,17 +652,17 @@
       if ((dA.id === 71 && dB.id === 83) || (dB.id === 71 && dA.id === 83)) {
         return { 
           status: 2, 
-          notes: "INCOMPATIBILE / ALLERTA CLINICA: Rischio sinergico di Nefrotossicità Acuta Severa (AKI) documentato in ICU e rischio di precipitazione fisica e opalescenza in Y-site in base a carrier e concentrazione. Somministrare su lumi separati.", 
+          notes: "INCOMPATIBILE / ALLERTA CLINICA: Rischio sinergico di Nefrotossicità Acuta Severa (AKI) documentato in letteratura intensivistica e rischio di precipitazione fisica e opalescenza sub-visibile in Y-site in base a concentrazione, temperatura e solvente (NaCl vs Glucosio). Raccomandata la somministrazione su lumi rigorosamente separati.", 
           source: `Evidenza Clinica & Compatibilità: <a href="https://journals.sagepub.com/doi/10.1310/hpj4801-44" target="_blank" rel="noopener noreferrer">Hospital Pharmacy Journal (Y-site Compatibility) ↗</a>` 
         };
       }
 
-      // 3. Fenitoina Sodica EV (Black Box Warning)
+      // 3. Fenitoina Sodica EV (Black Box Warning & Precipitazione) - NESSUN LINK
       if (dA.id === 70 || dB.id === 70) {
         return { 
           status: 2, 
-          notes: "INCOMPATIBILITÀ ASSOLUTA: La Fenitoina è solubilizzata solo a pH alcalino (~12). A contatto con qualsiasi altro farmaco/carrier precipita istantaneamente come acido libero. Black Box Warning per Purple Glove Syndrome (ischemia/necrosi) e aritmie da infusione.", 
-          source: `FDA Boxed Warning & Studio Clinico: <a href="https://pubmed.ncbi.nlm.nih.gov/25897334/" target="_blank" rel="noopener noreferrer">Purple Glove Syndrome Review (PMID: 25897334) ↗</a>` 
+          notes: "INCOMPATIBILITÀ ASSOLUTA: La fenitoina è solubilizzata esclusivamente a pH fortemente alcalino (~12). Qualsiasi miscelazione con carrier standard o farmaci a pH fisiologico/acido abbassa il pH provocando la precipitazione istantanea del principio attivo come acido libero microcristallino. Black Box Warning per tossicità locale grave (Purple Glove Syndrome con ischemia/necrosi tissutale) e aritmie/ipotensione da infusione rapida. Richiede accesso dedicato, filtro in linea e solvente esclusivo (NaCl 0.9%).", 
+          source: "FDA Boxed Warning & Scheda Tecnica" 
         };
       }
 
@@ -672,7 +672,7 @@
       if ((isAmino(dA) && isBeta(dB)) || (isAmino(dB) && isBeta(dA))) {
         return { 
           status: 2, 
-          notes: "INATTIVAZIONE CHIMICA: Legame covalente diretto tra anello beta-lattamico e gruppi aminici con perdita completa dell'attività antibatterica. Vietata la co-infusione sulla stessa via o miscelazione nella stessa sacca.", 
+          notes: "INATTIVAZIONE CHIMICA: Inattivazione chimica per apertura dell'anello beta-lattamico e legame covalente con i gruppi aminici dell'aminoglicoside, con formazione di composti ammidici privi di attività antibatterica. Non somministrare mai nella stessa sacca o contemporaneamente sullo stesso lume.", 
           source: `Studio Farmacocinetico: <a href="https://pubmed.ncbi.nlm.nih.gov/3717186/" target="_blank" rel="noopener noreferrer">Inactivation of Aminoglycosides (PMID: 3717186) ↗</a>` 
         };
       }
@@ -683,31 +683,31 @@
       if ((isBicarb(dA) && isDivalent(dB)) || (isBicarb(dB) && isDivalent(dA))) {
         return { 
           status: 2, 
-          notes: "INCOMPATIBILITÀ CHIMICA CRITICA: Reazione immediata con formazione di carbonato di calcio o carbonato di magnesio (sali insolubili biancastri). Rischio occlusione immediata del lume ed embolizzazione microcristallina.", 
+          notes: "INCOMPATIBILITÀ CHIMICA CRITICA: Reazione chimica immediata con formazione di carbonato di calcio e carbonato di magnesio, sali totalmente insolubili in acqua che precipitano sotto forma di aggregati macroscopici biancastri. Rischio occlusione irreversibile del lume del catetere ed embolizzazione microcristallina.", 
           source: `Studio di Stabilità Chimica: <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC3096563/" target="_blank" rel="noopener noreferrer">PMC Incompatibilities Review (PMC3096563) ↗</a>` 
         };
       }
 
-      // 6. Furosemide vs Farmaci Acidi (Amine, Oppioidi, Midazolam)
+      // 6. Furosemide vs Farmaci Acidi (Amine, Oppioidi, Midazolam) - NESSUN LINK
       const isFuro = (d) => d.id === 36 || d.name.toLowerCase().includes("furosemide");
       const isAcidCritical = (d) => d.isVasoactive || d.isSedation || d.ph === "acid" || d.id === 1 || d.id === 27 || d.id === 65 || d.id === 32 || d.id === 57 || d.id === 59;
       if ((isFuro(dA) && isAcidCritical(dB)) || (isFuro(dB) && isAcidCritical(dA))) {
         return { 
           status: 2, 
-          notes: "PRECIPITAZIONE FISICA: La furosemide (solubile solo a pH basico 8-9) precipita istantaneamente in forma acida insolubile (opalescenza lattescente) a contatto con molecole a pH acido (amine, oppioidi, midazolam).", 
-          source: `Stabilità Farmaceutica: <a href="https://pubmed.ncbi.nlm.nih.gov/11497330/" target="_blank" rel="noopener noreferrer">Furosemide Compatibility Analysis (PMID: 11497330) ↗</a>` 
+          notes: "PRECIPITAZIONE FISICA: La furosemide è solubile solo a pH basico (pH 8.0-9.3). Il contatto con soluzioni a pH acido (come le amine e gli oppioidi, tipicamente tamponati a pH 3.0-4.5) causa la precipitazione immediata dell'acido furosemico in sospensione lattescente. Divieto di co-infusione sulla linea vasoattivi o sedazione.", 
+          source: "Stabilità Chimico-Fisica & Scheda Tecnica" 
         };
       }
 
-      // 7. Propofol ed Emulsioni Lipidiche vs Elettroliti Puri o Farmaci Sconosciuti
+      // 7. Propofol ed Emulsioni Lipidiche vs Elettroliti Puri o Farmaci Sconosciuti - NESSUN LINK
       const isPropofol = (d) => d.id === 74 || d.ph === "lipid_emulsion";
       if (isPropofol(dA) || isPropofol(dB)) {
         const other = isPropofol(dA) ? dB : dA;
         if (other.isElectrolyte && other.id !== 38) { // Eparina ammessa a basse dosi
           return { 
             status: 2, 
-            notes: "RISCHIO CRACKING EMULSIONE: Gli elettroliti ad alta forza ionica alterano il potenziale Zeta dei globuli lipidici del Propofol, provocando coalescenza e gocce lipidiche > 5 micron con rischio di microembolia polmonare.", 
-            source: `Linee Guida Sicurezza Emulsioni: <a href="https://www.cdc.gov/infection-control/hcp/dialysis/safe-handling-propofol.html" target="_blank" rel="noopener noreferrer">CDC/FDA Lipid Emulsion & Handling Guidelines ↗</a>` 
+            notes: "RISCHIO CRACKING EMULSIONE: Alterazione della carica elettrostatica (potenziale Zeta) dei globuli lipidici dell'emulsione, con conseguente 'cracking', coalescenza e formazione di gocce lipidiche di diametro > 5 micron. Rischio di microembolizzazione capillare polmonare e instabilità del farmaco.", 
+            source: "Linee Guida Sicurezza Emulsioni Lipidiche ICU" 
           };
         }
       }
