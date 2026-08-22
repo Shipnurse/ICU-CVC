@@ -76,30 +76,11 @@
     }
     .btn-back-main:hover { background: #e2e8f0; }
 
-    .home-header {
-      text-align: center;
-      margin: 12px 0 20px 0;
-    }
-    .home-header h2 {
-      font-size: 1.35rem;
-      font-weight: 800;
-      color: var(--text);
-      letter-spacing: -0.02em;
-    }
-    .home-header p {
-      font-size: 0.85rem;
-      color: var(--text-muted);
-      margin-top: 6px;
-      line-height: 1.45;
-      padding: 0 8px;
-    }
+    .home-header { text-align: center; margin: 12px 0 20px 0; }
+    .home-header h2 { font-size: 1.35rem; font-weight: 800; color: var(--text); letter-spacing: -0.02em; }
+    .home-header p { font-size: 0.85rem; color: var(--text-muted); margin-top: 6px; line-height: 1.45; padding: 0 8px; }
 
-    .mode-selection-grid {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 14px;
-      margin-top: 10px;
-    }
+    .mode-selection-grid { display: grid; grid-template-columns: 1fr; gap: 14px; margin-top: 10px; }
     .mode-card {
       background: var(--card-bg);
       border: 2px solid var(--border);
@@ -140,13 +121,7 @@
       color: var(--disclaimer-text);
       line-height: 1.45;
     }
-    .disclaimer-card strong {
-      display: block;
-      margin-bottom: 4px;
-      font-size: 0.82rem;
-      text-transform: uppercase;
-      letter-spacing: 0.03em;
-    }
+    .disclaimer-card strong { display: block; margin-bottom: 4px; font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.03em; }
 
     .card {
       background: var(--card-bg);
@@ -168,12 +143,7 @@
       align-items: center;
     }
 
-    .lumen-selector-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 8px;
-      margin-bottom: 14px;
-    }
+    .lumen-selector-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 14px; }
     .btn-lumen {
       padding: 10px 4px;
       border: 2px solid var(--border);
@@ -185,11 +155,7 @@
       cursor: pointer;
       text-align: center;
     }
-    .btn-lumen.active {
-      border-color: var(--primary);
-      background: var(--primary-light);
-      color: var(--primary-dark);
-    }
+    .btn-lumen.active { border-color: var(--primary); background: var(--primary-light); color: var(--primary-dark); }
 
     .chips-container { display: flex; flex-wrap: wrap; gap: 8px; }
     .chip {
@@ -263,13 +229,7 @@
       border-bottom: 1px solid var(--border);
     }
     .lumen-tag { font-weight: 800; font-size: 0.95rem; color: var(--primary-dark); }
-    .lumen-badge {
-      font-size: 0.7rem;
-      font-weight: 700;
-      padding: 3px 8px;
-      border-radius: 12px;
-      text-transform: uppercase;
-    }
+    .lumen-badge { font-size: 0.7rem; font-weight: 700; padding: 3px 8px; border-radius: 12px; text-transform: uppercase; }
     
     .bolus-alert-box {
       background: var(--alert-bolus-bg);
@@ -394,11 +354,17 @@
     .source-box {
       background: #f1f5f9;
       border-left: 3px solid #0284c7;
-      padding: 6px 10px;
-      font-size: 0.75rem;
-      color: #475569;
-      border-radius: 0 4px 4px 0;
-      margin-top: 6px;
+      padding: 8px 10px;
+      font-size: 0.78rem;
+      color: #334155;
+      border-radius: 0 6px 6px 0;
+      margin-top: 8px;
+      line-height: 1.45;
+    }
+    .source-box a {
+      color: #0369a1;
+      text-decoration: underline;
+      font-weight: 700;
     }
   </style>
 </head>
@@ -547,12 +513,12 @@
     // 1. Variabile per Database Matrice Ufficiale
     let officialCompatibilityMatrix = {};
 
-    // 2. Caricamento del file JSON (funzionamento online/offline)
+    // 2. Caricamento asincrono del file JSON (online & offline)
     fetch('./compatibility_matrix.json')
       .then(res => res.json())
       .then(data => {
         officialCompatibilityMatrix = data;
-        console.log('Database compatibilità caricato con successo:', Object.keys(data).length, 'coppie');
+        console.log('Database compatibilità caricato:', Object.keys(data).length, 'coppie');
       })
       .catch(err => console.error('Errore caricamento matrice:', err));
 
@@ -654,25 +620,100 @@
       { id: 87, name: "Nutrizione parenterale SENZA LIPIDI", matrixKey: "Nutrizione parenterale SENZA LIPIDI*", commercial: "Nutriflex Basale, Sacca 2-in-1", category: "NPT 2-in-1", ph: "npt", isVasoactive: false, isSedation: false, isElectrolyte: false, canBolus: false, requiresCentral: true, dosage: "Target azotato/glucosato", carriers: "Soluzione binaria", notes: "LUME DEDICATO ESCLUSIVO.", source: "Tabelle Validate Y-Site" }
     ];
 
-    // 4. Risolutore Ibrido: Regole Cliniche (Priorità 1) + Database Ufficiale (Priorità 2)
+    // 4. Risolutore Ibrido: Alert di Farmacovigilanza (P1) + Database Ufficiale (P2)
     function evaluateCompatibility(dA, dB) {
-      if (dA.id === dB.id) return { status: 1, notes: "Stesso principio attivo.", source: "Identità Clinica" };
+      if (dA.id === dB.id) return { status: 1, notes: "Stesso principio attivo.", source: "Identità Farmacologica" };
 
-      // PRIORITÀ 1: Regole di Sicurezza Clinica Assoluta
-      if (dA.ph === "npt" || dB.ph === "npt") {
-        return { status: 2, notes: "INCOMPATIBILE: La NPT richiede rigorosamente un lume dedicato ed esclusivo.", source: "Regola Clinica Assoluta" };
-      }
+      // ==========================================
+      // PRIORITÀ 1: ALERT FARMACOVIGILANZA & SICUREZZA
+      // ==========================================
 
+      // 1. Ceftriaxone vs Calcio (Rocephin + Calcio/Ringer/NPT)
       if ((dA.id === 17 && (dB.id === 10 || dB.id === 91 || dB.ph === "calcium" || dB.id === 84 || dB.id === 85)) || 
           (dB.id === 17 && (dA.id === 10 || dA.id === 91 || dA.ph === "calcium" || dA.id === 84 || dA.id === 85))) {
-        return { status: 2, notes: "CONTROINDICAZIONE ASSOLUTA: Rischio precipitazione letale Ceftriaxone-Calcio.", source: "Alert Farmacovigilanza" };
+        return { 
+          status: 2, 
+          notes: "CONTROINDICAZIONE ASSOLUTA: Rischio di precipitazione intravascolare rapida di cristalli insolubili di ceftriaxone-calcio a livello polmonare e renale, con rischio di embolizzazione microcristallina, insufficienza d'organo e decesso.", 
+          source: `Alert Farmacovigilanza MHRA/EMA: <a href="https://www.gov.uk/drug-safety-update/ceftriaxone-rocephin-incompatible-with-solutions-containing-calcium" target="_blank" rel="noopener noreferrer">Drug Safety Update (Rocephin & Calcium) ↗</a>` 
+        };
       }
 
+      // 2. Piperacillina / Tazobactam vs Vancomicina
+      if ((dA.id === 71 && dB.id === 83) || (dB.id === 71 && dA.id === 83)) {
+        return { 
+          status: 2, 
+          notes: "INCOMPATIBILE / ALLERTA CLINICA: Rischio sinergico di Nefrotossicità Acuta Severa (AKI) documentato in ICU e rischio di precipitazione fisica e opalescenza in Y-site in base a carrier e concentrazione. Somministrare su lumi separati.", 
+          source: `Evidenza Clinica & Compatibilità: <a href="https://journals.sagepub.com/doi/10.1310/hpj4801-44" target="_blank" rel="noopener noreferrer">Hospital Pharmacy Journal (Y-site Compatibility) ↗</a>` 
+        };
+      }
+
+      // 3. Fenitoina Sodica EV (Black Box Warning)
       if (dA.id === 70 || dB.id === 70) {
-        return { status: 2, notes: "INCOMPATIBILE: La Fenitoina (pH ~12) precipita a contatto con qualsiasi altra soluzione.", source: "Regola Chimico-Fisica" };
+        return { 
+          status: 2, 
+          notes: "INCOMPATIBILITÀ ASSOLUTA: La Fenitoina è solubilizzata solo a pH alcalino (~12). A contatto con qualsiasi altro farmaco/carrier precipita istantaneamente come acido libero. Black Box Warning per Purple Glove Syndrome (ischemia/necrosi) e aritmie da infusione.", 
+          source: `FDA Boxed Warning & Studio Clinico: <a href="https://pubmed.ncbi.nlm.nih.gov/25897334/" target="_blank" rel="noopener noreferrer">Purple Glove Syndrome Review (PMID: 25897334) ↗</a>` 
+        };
       }
 
-      // PRIORITÀ 2: Interrogazione Database Ufficiale
+      // 4. Inattivazione Aminoglicosidi vs Beta-Lattamici (Amikacina/Gentamicina vs Penicilline)
+      const isAmino = (d) => d.ph === "aminoglycoside" || d.id === 2 || d.id === 37;
+      const isBeta = (d) => d.ph === "betalactam" || d.category.includes("Penicillina") || d.id === 5 || d.id === 6 || d.id === 9 || d.id === 33 || d.id === 71;
+      if ((isAmino(dA) && isBeta(dB)) || (isAmino(dB) && isBeta(dA))) {
+        return { 
+          status: 2, 
+          notes: "INATTIVAZIONE CHIMICA: Legame covalente diretto tra anello beta-lattamico e gruppi aminici con perdita completa dell'attività antibatterica. Vietata la co-infusione sulla stessa via o miscelazione nella stessa sacca.", 
+          source: `Studio Farmacocinetico: <a href="https://pubmed.ncbi.nlm.nih.gov/3717186/" target="_blank" rel="noopener noreferrer">Inactivation of Aminoglycosides (PMID: 3717186) ↗</a>` 
+        };
+      }
+
+      // 5. Sodio Bicarbonato 8.4% vs Sali Divalenti (Calcio e Magnesio)
+      const isBicarb = (d) => d.id === 77 || d.name.toLowerCase().includes("bicarbonato");
+      const isDivalent = (d) => d.ph === "calcium" || d.id === 10 || d.id === 91 || d.id === 50 || d.name.toLowerCase().includes("magnesio");
+      if ((isBicarb(dA) && isDivalent(dB)) || (isBicarb(dB) && isDivalent(dA))) {
+        return { 
+          status: 2, 
+          notes: "INCOMPATIBILITÀ CHIMICA CRITICA: Reazione immediata con formazione di carbonato di calcio o carbonato di magnesio (sali insolubili biancastri). Rischio occlusione immediata del lume ed embolizzazione microcristallina.", 
+          source: `Studio di Stabilità Chimica: <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC3096563/" target="_blank" rel="noopener noreferrer">PMC Incompatibilities Review (PMC3096563) ↗</a>` 
+        };
+      }
+
+      // 6. Furosemide vs Farmaci Acidi (Amine, Oppioidi, Midazolam)
+      const isFuro = (d) => d.id === 36 || d.name.toLowerCase().includes("furosemide");
+      const isAcidCritical = (d) => d.isVasoactive || d.isSedation || d.ph === "acid" || d.id === 1 || d.id === 27 || d.id === 65 || d.id === 32 || d.id === 57 || d.id === 59;
+      if ((isFuro(dA) && isAcidCritical(dB)) || (isFuro(dB) && isAcidCritical(dA))) {
+        return { 
+          status: 2, 
+          notes: "PRECIPITAZIONE FISICA: La furosemide (solubile solo a pH basico 8-9) precipita istantaneamente in forma acida insolubile (opalescenza lattescente) a contatto con molecole a pH acido (amine, oppioidi, midazolam).", 
+          source: `Stabilità Farmaceutica: <a href="https://pubmed.ncbi.nlm.nih.gov/11497330/" target="_blank" rel="noopener noreferrer">Furosemide Compatibility Analysis (PMID: 11497330) ↗</a>` 
+        };
+      }
+
+      // 7. Propofol ed Emulsioni Lipidiche vs Elettroliti Puri o Farmaci Sconosciuti
+      const isPropofol = (d) => d.id === 74 || d.ph === "lipid_emulsion";
+      if (isPropofol(dA) || isPropofol(dB)) {
+        const other = isPropofol(dA) ? dB : dA;
+        if (other.isElectrolyte && other.id !== 38) { // Eparina ammessa a basse dosi
+          return { 
+            status: 2, 
+            notes: "RISCHIO CRACKING EMULSIONE: Gli elettroliti ad alta forza ionica alterano il potenziale Zeta dei globuli lipidici del Propofol, provocando coalescenza e gocce lipidiche > 5 micron con rischio di microembolia polmonare.", 
+            source: `Linee Guida Sicurezza Emulsioni: <a href="https://www.cdc.gov/infection-control/hcp/dialysis/safe-handling-propofol.html" target="_blank" rel="noopener noreferrer">CDC/FDA Lipid Emulsion & Handling Guidelines ↗</a>` 
+          };
+        }
+      }
+
+      // Regola Clinica NPT
+      if (dA.ph === "npt" || dB.ph === "npt") {
+        return { 
+          status: 2, 
+          notes: "INCOMPATIBILE: La Nutrizione Parenterale (NPT) richiede rigorosamente un lume dedicato ed esclusivo per prevenire infezioni correlate a CVC e destabilizzazione dell'emulsione.", 
+          source: "Regola Clinica Assoluta ICU" 
+        };
+      }
+
+      // ==========================================
+      // PRIORITÀ 2: MATRICE UFFICIALE Y-SITE (JSON)
+      // ==========================================
       const keyA = dA.matrixKey || dA.name.toUpperCase().trim();
       const keyB = dB.matrixKey || dB.name.toUpperCase().trim();
 
@@ -687,7 +728,9 @@
         return { status: 2, notes: "Incompatibile documentato in Y-site.", source: "Matrice Ufficiale" };
       }
 
-      // PRIORITÀ 3: Cluster Logici di Fallback
+      // ==========================================
+      // PRIORITÀ 3: CLUSTER LOGICI ICU & CAUTELA
+      // ==========================================
       if (dA.isVasoactive && dB.isVasoactive) {
         return { status: 1, notes: "Compatibile per linea vasoattiva continua.", source: "Protocollo ICU" };
       }
@@ -698,7 +741,7 @@
         return { status: 1, notes: "Compatibile per linea sedazione & analgesia.", source: "Protocollo ICU" };
       }
 
-      return { status: 0, notes: "⚠️ DATO NON PRESENTE: Nessun test documentato. Somministrare su linea separata.", source: "Principio di Massima Cautela" };
+      return { status: 0, notes: "⚠️ DATO NON PRESENTE: Nessun test documentato in tabella. Somministrare su linea separata.", source: "Principio di Massima Cautela" };
     }
 
     // Stato Globale
@@ -832,7 +875,7 @@
         }
       }
 
-      // 5. Restanti
+      // 5. Restanti Farmaci
       unassigned.forEach(drug => {
         let placed = false;
         for (let group of groups) {
@@ -1046,7 +1089,7 @@
                 <span class="badge ${badgeClass}">${badgeText}</span>
               </div>
               <div style="font-size:0.85rem; color:#334155; line-height:1.4;">${res.notes}</div>
-              <div class="source-box">📚 <strong>Riferimento:</strong> ${res.source}</div>
+              <div class="source-box">📚 <strong>Riferimento & Linee Guida:</strong> ${res.source}</div>
             </div>
           `;
         }
