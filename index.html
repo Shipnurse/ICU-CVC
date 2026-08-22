@@ -169,6 +169,7 @@
       align-items: center;
       gap: 6px;
     }
+    .chip .chip-label { cursor: pointer; text-decoration: underline dotted; }
     .chip .remove {
       cursor: pointer;
       font-weight: bold;
@@ -277,8 +278,17 @@
       justify-content: space-between;
       font-size: 0.88rem;
       border-bottom: 1px dashed #f1f5f9;
+      align-items: center;
     }
     .drug-row-item:last-child { border-bottom: none; }
+    .drug-clickable-name {
+      cursor: pointer;
+      text-decoration: underline;
+      color: var(--text);
+    }
+    .drug-clickable-name:hover {
+      color: var(--primary);
+    }
 
     .result-card {
       background: var(--card-bg);
@@ -633,7 +643,7 @@
           (dB.id === 17 && (dA.id === 10 || dA.id === 91 || dA.ph === "calcium" || dA.id === 84 || dA.id === 85))) {
         return { 
           status: 2, 
-          notes: "CONTROINDICAZIONE ASSOLUTA: Rischio di precipitazione intravascolare rapida di cristalli insolubili di ceftriaxone-calcio a livello polmonare e renale, con rischio di embolizzazione microcristallina, insufficienza d'organo e decesso.", 
+          notes: "CONTROINDICAZIONE ASSOLUTA: Precipitazione intravascolare rapida di cristalli insolubili di ceftriaxone-calcio a livello polmonare e renale, con rischio di embolizzazione microcristallina, insufficienza d'organo acuta e decesso.", 
           source: `Alert Farmacovigilanza MHRA/EMA: <a href="https://www.gov.uk/drug-safety-update/ceftriaxone-rocephin-incompatible-with-solutions-containing-calcium" target="_blank" rel="noopener noreferrer">Drug Safety Update (Rocephin & Calcium) ↗</a>` 
         };
       }
@@ -971,7 +981,10 @@
             <div>
               ${group.drugs.map(d => `
                 <div class="drug-row-item">
-                  <span><strong>${d.name}</strong> <small style="color:var(--text-muted)">(${d.commercial.split(',')[0]})</small></span>
+                  <span>
+                    <strong class="drug-clickable-name" onclick="openDrugDetail(${d.id})" title="Clicca per aprire la scheda clinica">${d.name}</strong> 
+                    <small style="color:var(--text-muted)">(${d.commercial.split(',')[0]})</small>
+                  </span>
                   <span style="font-size:0.75rem; color:${d.requiresCentral ? '#b91c1c' : '#0284c7'}; font-weight:700;">
                     ${d.requiresCentral ? '⚠️ SOLO VIA CENTRALE' : d.category}
                   </span>
@@ -1049,7 +1062,10 @@
       matrixSelected.forEach(drug => {
         const chip = document.createElement("div");
         chip.className = "chip";
-        chip.innerHTML = `<span>${drug.name}</span><span class="remove" onclick="removeDrug(${drug.id}, 'matrix')">&times;</span>`;
+        chip.innerHTML = `
+          <span class="chip-label" onclick="openDrugDetail(${drug.id})" title="Clicca per aprire la scheda clinica">${drug.name}</span>
+          <span class="remove" onclick="removeDrug(${drug.id}, 'matrix')">&times;</span>
+        `;
         container.appendChild(chip);
       });
 
@@ -1082,9 +1098,9 @@
             <div class="result-card ${cardWarning}">
               <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:8px;">
                 <div>
-                  <strong style="cursor:pointer; text-decoration:underline;" onclick="openDrugDetail(${dA.id})">${dA.name}</strong>
+                  <strong class="drug-clickable-name" onclick="openDrugDetail(${dA.id})">${dA.name}</strong>
                   <span style="color:#94a3b8;"> + </span>
-                  <strong style="cursor:pointer; text-decoration:underline;" onclick="openDrugDetail(${dB.id})">${dB.name}</strong>
+                  <strong class="drug-clickable-name" onclick="openDrugDetail(${dB.id})">${dB.name}</strong>
                 </div>
                 <span class="badge ${badgeClass}">${badgeText}</span>
               </div>
@@ -1106,7 +1122,10 @@
       plannerSelected.forEach(drug => {
         const chip = document.createElement("div");
         chip.className = "chip";
-        chip.innerHTML = `<span>${drug.name}</span><span class="remove" onclick="removeDrug(${drug.id}, 'planner')">&times;</span>`;
+        chip.innerHTML = `
+          <span class="chip-label" onclick="openDrugDetail(${drug.id})" title="Clicca per aprire la scheda clinica">${drug.name}</span>
+          <span class="remove" onclick="removeDrug(${drug.id}, 'planner')">&times;</span>
+        `;
         container.appendChild(chip);
       });
     }
