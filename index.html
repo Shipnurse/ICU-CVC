@@ -76,7 +76,6 @@
     }
     .btn-back-main:hover { background: #e2e8f0; }
 
-    /* Home View */
     .home-header {
       text-align: center;
       margin: 12px 0 20px 0;
@@ -131,7 +130,6 @@
     .mode-title { font-weight: 800; font-size: 1.05rem; color: var(--text); margin-bottom: 4px; }
     .mode-desc { font-size: 0.82rem; color: var(--text-muted); line-height: 1.45; }
 
-    /* Disclaimer Box */
     .disclaimer-card {
       background-color: var(--disclaimer-bg);
       border: 1px solid var(--disclaimer-border);
@@ -150,7 +148,6 @@
       letter-spacing: 0.03em;
     }
 
-    /* Card & Controlli */
     .card {
       background: var(--card-bg);
       border-radius: 12px;
@@ -245,7 +242,6 @@
       cursor: pointer;
     }
 
-    /* Schede Lumi */
     .lumen-card {
       background: var(--card-bg);
       border: 1.5px solid var(--border);
@@ -324,7 +320,6 @@
     }
     .drug-row-item:last-child { border-bottom: none; }
 
-    /* Risultati Matrice */
     .result-card {
       background: var(--card-bg);
       border: 1px solid var(--border);
@@ -346,7 +341,6 @@
     .badge-conditional { background: var(--cond-bg); color: var(--cond-text); }
     .badge-unknown { background: var(--unknown-bg); color: var(--unknown-text); border: 1px solid var(--unknown-border); }
 
-    /* Modali */
     .modal-overlay {
       display: none;
       position: fixed;
@@ -421,7 +415,7 @@
 
   <div class="container">
     
-    <!-- 1. HOME VIEW (Schermata Iniziale) -->
+    <!-- 1. HOME VIEW -->
     <div id="viewHome">
       <div class="home-header">
         <h2>Supporto Infusionale CVC</h2>
@@ -446,7 +440,6 @@
         </div>
       </div>
 
-      <!-- Disclaimer Medico-Legale -->
       <div class="disclaimer-card">
         <strong>⚠️ Avvertenza & Disclaimer</strong>
         La presente applicazione è uno strumento di supporto informativo e decisionale e non intende in alcun modo sostituirsi alle scelte, al giudizio clinico o alla responsabilità del medico e del professionista sanitario. Nonostante la rigorosa elaborazione dei dati, potrebbero essere presenti errori o variazioni di compatibilità legate a specifici marchi, concentrazioni o carrier; l'applicazione e i suoi autori non possono essere ritenuti responsabili per danni, complicanze o eventi avversi derivanti dall'utilizzo delle informazioni fornite. Verificare sempre la scheda tecnica del farmaco e i protocolli aziendali prima della somministrazione.
@@ -457,7 +450,6 @@
     <div id="viewPlanner" style="display: none;">
       <button class="btn-back-main" onclick="switchView('home')">⬅️ Torna al Menu Principale</button>
       
-      <!-- Scelta CVC -->
       <div class="card">
         <div class="section-title">1. Configurazione CVC Paziente</div>
         <div class="lumen-selector-grid">
@@ -468,7 +460,6 @@
         </div>
       </div>
 
-      <!-- Scelta Farmaci -->
       <div class="card">
         <div class="section-title">
           <span>2. Farmaci Attivi in Prescrizione</span>
@@ -481,7 +472,6 @@
         </div>
       </div>
 
-      <!-- Risultati Allocazione Lumi -->
       <div>
         <div class="section-title">Piano di Distribuzione Ottimizzato</div>
         <div id="plannerResultsContainer">
@@ -554,189 +544,160 @@
   </div>
 
   <script>
-    // Database Completo (85 Farmaci & Soluzioni)
+    // 1. Variabile per Database Matrice Ufficiale
+    let officialCompatibilityMatrix = {};
+
+    // 2. Caricamento del file JSON (funzionamento online/offline)
+    fetch('./compatibility_matrix.json')
+      .then(res => res.json())
+      .then(data => {
+        officialCompatibilityMatrix = data;
+        console.log('Database compatibilità caricato con successo:', Object.keys(data).length, 'coppie');
+      })
+      .catch(err => console.error('Errore caricamento matrice:', err));
+
+    // 3. Database Farmaci & Soluzioni
     const drugsDB = [
-      { id: 0, name: "Aciclovir", commercial: "Zovirax, Aciclovir Labatec", category: "Antivirale", ph: "alkaline", isVasoactive: false, isSedation: false, isElectrolyte: false, canBolus: false, requiresCentral: false, dosage: "5 - 10 mg/kg ogni 8h in 1h", carriers: "Solo NaCl 0.9% (pH ~11)", notes: "Soluzione alcalina.", source: "Tabelle Validate Y-Site" },
-      { id: 1, name: "Adrenalina", commercial: "Adrenalina Sintetica, Epinephrine", category: "Vasopressore / Inotropo", ph: "acid", isVasoactive: true, isSedation: false, isElectrolyte: false, canBolus: false, requiresCentral: true, dosage: "0.01 - 0.5 mcg/kg/min continuo", carriers: "Glucosio 5%, NaCl 0.9%", notes: "Infusione continua titolata in CVC.", source: "Tabelle Validate Y-Site" },
-      { id: 2, name: "Amikacina", commercial: "Amikin, Likacin", category: "Aminoglicoside", ph: "aminoglycoside", isVasoactive: false, isSedation: false, isElectrolyte: false, canBolus: false, requiresCentral: false, dosage: "15 - 30 mg/kg monodose", carriers: "NaCl 0.9%, Glucosio 5%", notes: "Inattivato da beta-lattamici ed eparina.", source: "Tabelle Validate Y-Site" },
-      { id: 3, name: "Aminofillina", commercial: "Aminophyllin, Tefamin", category: "Broncodilatatore", ph: "alkaline", isVasoactive: false, isSedation: false, isElectrolyte: false, canBolus: false, requiresCentral: false, dosage: "0.5 - 0.7 mg/kg/h continuo", carriers: "NaCl 0.9%, Glucosio 5%", notes: "pH basico (8.6-9.0).", source: "Tabelle Validate Y-Site" },
-      { id: 4, name: "Amiodarone", commercial: "Cordarone, Amiodarone", category: "Antiaritmico Classe III", ph: "acid", isVasoactive: true, isSedation: false, isElectrolyte: false, canBolus: false, requiresCentral: false, dosage: "Carico 300mg -> 900mg/24h continuo", carriers: "ESCLUSIVAMENTE Glucosio 5%", notes: "Instabile in NaCl 0.9%. Compatibile in Y-site con catecolamine in Glucosata. Set PVC-free.", source: "Tabelle Validate Y-Site" },
-      { id: 5, name: "Amoxicillina", commercial: "Delamaryl, Clamoxyl", category: "Aminopenicillina", ph: "betalactam", isVasoactive: false, isSedation: false, isElectrolyte: false, canBolus: false, requiresCentral: false, dosage: "1 - 2g ogni 6-8h", carriers: "Solo NaCl 0.9%", notes: "Instabile nel glucosio.", source: "Tabelle Validate Y-Site" },
-      { id: 6, name: "Amoxicillina / Acido Clavulanico", commercial: "Co-Amoxi, Augmentin, Clavulin", category: "Beta-lattamico + Inibitore", ph: "betalactam", isVasoactive: false, isSedation: false, isElectrolyte: false, canBolus: false, requiresCentral: false, dosage: "1.2g - 2.2g ogni 8h", carriers: "Solo NaCl 0.9%", notes: "Instabile in carrier glucosati.", source: "Tabelle Validate Y-Site" },
-      { id: 7, name: "Argatroban", commercial: "Argatra", category: "Inibitore diretto trombina", ph: "acid", isVasoactive: false, isSedation: false, isElectrolyte: false, canBolus: false, requiresCentral: false, dosage: "Titolato su target aPTT", carriers: "NaCl 0.9%, Glucosio 5%", notes: "Uso in HIT.", source: "Tabelle Validate Y-Site" },
-      { id: 8, name: "Atracurio / Cisatracurio", commercial: "Tracrium, Nimbex", category: "Miorilassante", ph: "acid", isVasoactive: false, isSedation: true, isElectrolyte: false, canBolus: true, requiresCentral: false, dosage: "1 - 3 mcg/kg/min", carriers: "NaCl 0.9%, Glucosio 5%", notes: "Eliminazione di Hofmann organo-indipendente.", source: "Tabelle Validate Y-Site" },
-      { id: 9, name: "Benzilpenicillina", commercial: "Penicillin G", category: "Penicillina naturale", ph: "betalactam", isVasoactive: false, isSedation: false, isElectrolyte: false, canBolus: false, requiresCentral: false, dosage: "10 - 24 MUI/die frazionati", carriers: "NaCl 0.9%, Glucosio 5%", notes: "Incompatibile con aminoglicosidi.", source: "Tabelle Validate Y-Site" },
-      { id: 10, name: "Calcio gluconato", commercial: "Calciumgluconat, Calcio Gluconato", category: "Sali di Calcio", ph: "calcium", isVasoactive: false, isSedation: false, isElectrolyte: true, canBolus: true, requiresCentral: false, dosage: "10 - 20 ml ev in 10 min", carriers: "NaCl 0.9%, Glucosio 5%", notes: "Precipita con Bicarbonato e Ceftriaxone.", source: "Tabelle Validate Y-Site" },
-      { id: 91, name: "Calcio cloruro", commercial: "Calcio Cloruro 10%", category: "Sali di Calcio", ph: "calcium", isVasoactive: false, isSedation: false, isElectrolyte: true, canBolus: true, requiresCentral: true, dosage: "5 - 10 ml ev lento in CVC", carriers: "NaCl 0.9%, Glucosio 5%", notes: "Necrotizzante se stravasa.", source: "Tabelle Validate Y-Site" },
-      { id: 11, name: "Cefazolina", commercial: "Kefzol, Cefazolina", category: "Cefalosporina I", ph: "betalactam", isVasoactive: false, isSedation: false, isElectrolyte: false, canBolus: false, requiresCentral: false, dosage: "2g ogni 8h", carriers: "NaCl 0.9%, Glucosio 5%", notes: "Profilassi chirurgica.", source: "Tabelle Validate Y-Site" },
-      { id: 12, name: "Cefepime", commercial: "Cefepim, Maxipime", category: "Cefalosporina IV", ph: "betalactam", isVasoactive: false, isSedation: false, isElectrolyte: false, canBolus: false, requiresCentral: false, dosage: "2g ogni 8h", carriers: "NaCl 0.9%, Glucosio 5%", notes: "Antipseudomonas.", source: "Tabelle Validate Y-Site" },
-      { id: 13, name: "Ceftazidime", commercial: "Fortam, Glazidim", category: "Cefalosporina III", ph: "betalactam", isVasoactive: false, isSedation: false, isElectrolyte: false, canBolus: false, requiresCentral: false, dosage: "2g ogni 8h", carriers: "NaCl 0.9%, Glucosio 5%", notes: "Sviluppa micro-bolle CO2.", source: "Tabelle Validate Y-Site" },
-      { id: 14, name: "Ceftazidime / Avibactam", commercial: "Zavicefta", category: "Cefalosporina + Inibitore", ph: "betalactam", isVasoactive: false, isSedation: false, isElectrolyte: false, canBolus: false, requiresCentral: false, dosage: "2.5g ogni 8h in 2h", carriers: "NaCl 0.9%, Glucosio 5%", notes: "Attivo su enterobatteri KPC.", source: "Tabelle Validate Y-Site" },
-      { id: 15, name: "Ceftobiprole medocaril", commercial: "Zevtera", category: "Cefalosporina V (MRSA)", ph: "betalactam", isVasoactive: false, isSedation: false, isElectrolyte: false, canBolus: false, requiresCentral: false, dosage: "500 mg ogni 8h in 2h", carriers: "Glucosio 5%, NaCl 0.9%", notes: "Attivo su Gram-positivi resistenti.", source: "Tabelle Validate Y-Site" },
-      { id: 16, name: "Ceftolozane / Tazobactam", commercial: "Zerbaxa", category: "Cefalosporina + Inibitore", ph: "betalactam", isVasoactive: false, isSedation: false, isElectrolyte: false, canBolus: false, requiresCentral: false, dosage: "1.5g - 3g ogni 8h in 1h", carriers: "NaCl 0.9%, Glucosio 5%", notes: "Ottimale per Pseudomonas MDR.", source: "Tabelle Validate Y-Site" },
-      { id: 17, name: "Ceftriaxone", commercial: "Rocephin, Ceftriaxone", category: "Cefalosporina III", ph: "betalactam", isVasoactive: false, isSedation: false, isElectrolyte: false, canBolus: false, requiresCentral: false, dosage: "2g ogni 24h", carriers: "NaCl 0.9%, Glucosio 5%", notes: "CONTROINDICAZIONE ASSOLUTA CON SOLUZIONI CONTENENTI CALCIO.", source: "Tabelle Validate Y-Site" },
-      { id: 18, name: "Cefuroxime", commercial: "Zinacef, Cefuroxim", category: "Cefalosporina II", ph: "betalactam", isVasoactive: false, isSedation: false, isElectrolyte: false, canBolus: false, requiresCentral: false, dosage: "1.5g ogni 8h", carriers: "NaCl 0.9%, Glucosio 5%", notes: "Profilassi e terapia.", source: "Tabelle Validate Y-Site" },
-      { id: 19, name: "Ciclosporina", commercial: "Sandimmun", category: "Immunosoppressore", ph: "acid", isVasoactive: false, isSedation: false, isElectrolyte: false, canBolus: false, requiresCentral: false, dosage: "Titolata su concentrazione ematica", carriers: "NaCl 0.9%, Glucosio 5%", notes: "PVC-free obbligatorio.", source: "Tabelle Validate Y-Site" },
-      { id: 20, name: "Ciprofloxacina", commercial: "Ciproxine, Ciprofloxacin", category: "Fluorochinolone", ph: "acid", isVasoactive: false, isSedation: false, isElectrolyte: false, canBolus: false, requiresCentral: false, dosage: "400 mg ogni 8-12h", carriers: "NaCl 0.9%, Glucosio 5%", notes: "Fotosensibile.", source: "Tabelle Validate Y-Site" },
-      { id: 21, name: "Claritromicina", commercial: "Klacid, Veclam", category: "Macrolide", ph: "acid", isVasoactive: false, isSedation: false, isElectrolyte: false, canBolus: false, requiresCentral: false, dosage: "500 mg ogni 12h in 60 min", carriers: "NaCl 0.9%, Glucosio 5%", notes: "Non infondere rapido.", source: "Tabelle Validate Y-Site" },
-      { id: 22, name: "Clindamicina", commercial: "Dalacin C, Clindamycin", category: "Lincosamide", ph: "acid", isVasoactive: false, isSedation: false, isElectrolyte: false, canBolus: false, requiresCentral: false, dosage: "600 - 900 mg ogni 8h", carriers: "NaCl 0.9%, Glucosio 5%", notes: "Infondere in almeno 30 minuti.", source: "Tabelle Validate Y-Site" },
-      { id: 23, name: "Clonidina", commercial: "Catapresan", category: "Alfa-2 agonista", ph: "neutral", isVasoactive: false, isSedation: false, isElectrolyte: false, canBolus: true, requiresCentral: false, dosage: "0.1 - 0.5 mcg/kg/h", carriers: "NaCl 0.9%, Glucosio 5%", notes: "Evitare sospensioni brusche.", source: "Tabelle Validate Y-Site" },
-      { id: 24, name: "Desametasone", commercial: "Mephameson, Decadron, Soldesam", category: "Corticosteroide", ph: "neutral", isVasoactive: false, isSedation: false, isElectrolyte: false, canBolus: true, requiresCentral: false, dosage: "4 - 20 mg ev", carriers: "NaCl 0.9%, Glucosio 5%", notes: "Ampia stabilità.", source: "Tabelle Validate Y-Site" },
-      { id: 25, name: "Dexmedetomidina", commercial: "Dexdor", category: "Alfa-2 agonista sedativo", ph: "acid", isVasoactive: false, isSedation: true, isElectrolyte: false, canBolus: false, requiresCentral: false, dosage: "0.2 - 1.4 mcg/kg/h", carriers: "NaCl 0.9%, Glucosio 5%", notes: "Sedazione cosciente cooperativa.", source: "Tabelle Validate Y-Site" },
-      { id: 26, name: "Diclofenac", commercial: "Voltaren", category: "FANS", ph: "alkaline", isVasoactive: false, isSedation: false, isElectrolyte: false, canBolus: true, requiresCentral: false, dosage: "75 mg ev in infusione", carriers: "NaCl 0.9%, Glucosio 5% tamponato", notes: "Tamponare con bicarbonato se in flebo.", source: "Tabelle Validate Y-Site" },
-      { id: 27, name: "Dobutamina", commercial: "Dobutrex, Dobutamin", category: "Inotropo positivo", ph: "acid", isVasoactive: true, isSedation: false, isElectrolyte: false, canBolus: false, requiresCentral: true, dosage: "2.5 - 20 mcg/kg/min", carriers: "Glucosio 5%, NaCl 0.9%", notes: "Inotropo a titolazione continua.", source: "Tabelle Validate Y-Site" },
-      { id: 8, name: "Dopamina", commercial: "Dopamina Sintetica, Revivan", category: "Inotropo / Vasopressore", ph: "acid", isVasoactive: true, isSedation: false, isElectrolyte: false, canBolus: false, requiresCentral: true, dosage: "2 - 20 mcg/kg/min", carriers: "Glucosio 5%, NaCl 0.9%", notes: "Infusione continua.", source: "Tabelle Validate Y-Site" },
-      { id: 28, name: "Ertapenem", commercial: "Invanz", category: "Carbapenemico", ph: "betalactam", isVasoactive: false, isSedation: false, isElectrolyte: false, canBolus: false, requiresCentral: false, dosage: "1g ogni 24h in 30 min", carriers: "Solo NaCl 0.9%", notes: "Instabile in soluzioni contenenti glucosio.", source: "Tabelle Validate Y-Site" },
-      { id: 29, name: "Eritromicina", commercial: "Erythrocin", category: "Macrolide", ph: "acid", isVasoactive: false, isSedation: false, isElectrolyte: false, canBolus: false, requiresCentral: false, dosage: "500 mg - 1g ogni 6h", carriers: "NaCl 0.9%, Glucosio 5%", notes: "Procinetico o antibatterico.", source: "Tabelle Validate Y-Site" },
-      { id: 30, name: "Esketamina / Ketamina", commercial: "Esketamin, Ketanest, Ketalar", category: "Anestetico NMDA", ph: "acid", isVasoactive: false, isSedation: true, isElectrolyte: false, canBolus: true, requiresCentral: false, dosage: "0.2 - 1.0 mg/kg/h", carriers: "NaCl 0.9%, Glucosio 5%", notes: "Analgesia dissociativa.", source: "Tabelle Validate Y-Site" },
-      { id: 31, name: "Esomeprazolo / Pantoprazolo", commercial: "Nexium, Pantozol, Peptazol", category: "PPI", ph: "alkaline", isVasoactive: false, isSedation: false, isElectrolyte: false, canBolus: true, requiresCentral: false, dosage: "Boli 40-80 mg o continuo 8 mg/h", carriers: "NaCl 0.9%, Glucosio 5%", notes: "pH fortemente alcalino (9.0-10.5).", source: "Tabelle Validate Y-Site" },
-      { id: 32, name: "Fentanil", commercial: "Fentanyl, Sintenyl", category: "Oppioide maggiore", ph: "acid", isVasoactive: false, isSedation: true, isElectrolyte: false, canBolus: true, requiresCentral: false, dosage: "1 - 5 mcg/kg/h / Boli 50-100 mcg", carriers: "NaCl 0.9%, Glucosio 5%", notes: "Oppioide standard ICU.", source: "Tabelle Validate Y-Site" },
-      { id: 33, name: "Flucloxacillina", commercial: "Floxapen", category: "Penicillina antistafilococcica", ph: "betalactam", isVasoactive: false, isSedation: false, isElectrolyte: false, canBolus: false, requiresCentral: false, dosage: "1 - 2g ogni 6h", carriers: "NaCl 0.9%, Glucosio 5%", notes: "Trattamento MSSA.", source: "Tabelle Validate Y-Site" },
-      { id: 34, name: "Fluconazolo", commercial: "Diflucan, Fluconazol", category: "Antimicotico", ph: "neutral", isVasoactive: false, isSedation: false, isElectrolyte: false, canBolus: false, requiresCentral: false, dosage: "200 - 800 mg/die", carriers: "Pronto all'uso in NaCl 0.9%", notes: "Soluzione isotonica.", source: "Tabelle Validate Y-Site" },
-      { id: 35, name: "Flumazenil", commercial: "Anexate, Flumazenil", category: "Antidoto benzodiazepine", ph: "acid", isVasoactive: false, isSedation: false, isElectrolyte: false, canBolus: true, requiresCentral: false, dosage: "0.2 - 0.5 mg ev a bolo lento", carriers: "NaCl 0.9%, Glucosio 5%", notes: "Monitorare re-sedazione.", source: "Tabelle Validate Y-Site" },
-      { id: 36, name: "Furosemide", commercial: "Lasix", category: "Diuretico dell'ansa", ph: "alkaline", isVasoactive: false, isSedation: false, isElectrolyte: false, canBolus: true, requiresCentral: false, dosage: "Boli 20-40 mg o continuo 5-40 mg/h", carriers: "Solo NaCl 0.9% (pH 8.0-9.3)", notes: "Compatibile con KCl, MgSO4, Eparina, Meropenem, Pantoprazolo. Incompatibile con acidi.", source: "Tabelle Validate Y-Site" },
-      { id: 37, name: "Gentamicina", commercial: "Gentamicin, Gentalyn", category: "Aminoglicoside", ph: "aminoglycoside", isVasoactive: false, isSedation: false, isElectrolyte: false, canBolus: false, requiresCentral: false, dosage: "5 - 7 mg/kg monodose", carriers: "NaCl 0.9%, Glucosio 5%", notes: "Incompatibile con penicilline ed eparina.", source: "Tabelle Validate Y-Site" },
-      { id: 38, name: "Eparina sodica", commercial: "Liquemin", category: "Anticoagulante", ph: "neutral", isVasoactive: false, isSedation: false, isElectrolyte: false, canBolus: true, requiresCentral: false, dosage: "Titolata su aPTT", carriers: "NaCl 0.9%, Glucosio 5%", notes: "Compatibile con le amine, KCl, MgSO4, Furosemide. Incompatibile con aminoglicosidi.", source: "Tabelle Validate Y-Site" },
-      { id: 39, name: "Idromorfone", commercial: "Palladon", category: "Oppioide maggiore", ph: "acid", isVasoactive: false, isSedation: true, isElectrolyte: false, canBolus: true, requiresCentral: false, dosage: "0.15 - 0.5 mg/h", carriers: "NaCl 0.9%, Glucosio 5%", notes: "Potente analgesico.", source: "Tabelle Validate Y-Site" },
-      { id: 40, name: "Ibuprofene", commercial: "Ibuprofen, Pedea", category: "FANS", ph: "alkaline", isVasoactive: false, isSedation: false, isElectrolyte: false, canBolus: false, requiresCentral: false, dosage: "400 - 800 mg ogni 8h in 30 min", carriers: "NaCl 0.9%, Glucosio 5%", notes: "pH debolmente alcalino.", source: "Tabelle Validate Y-Site" },
-      { id: 41, name: "Imipenem / Cilastatina", commercial: "Tienam, Imipenem", category: "Carbapenemico", ph: "betalactam", isVasoactive: false, isSedation: false, isElectrolyte: false, canBolus: false, requiresCentral: false, dosage: "500 mg - 1g ogni 6-8h in 40-60 min", carriers: "NaCl 0.9%, Glucosio 5%", notes: "Rischio convulsioni ad alte dosi.", source: "Tabelle Validate Y-Site" },
-      { id: 42, name: "Insulina rapida", commercial: "Novorapid, Actrapid, Insuman", category: "Ormone ipoglicemizzante", ph: "neutral", isVasoactive: false, isSedation: false, isElectrolyte: false, canBolus: false, requiresCentral: false, dosage: "Titolazione oraria continua su glicemia", carriers: "Solo NaCl 0.9%", notes: "Flussare il set prima di iniziare.", source: "Tabelle Validate Y-Site" },
-      { id: 43, name: "Isoprenalina", commercial: "Isuprel, Aleudrina", category: "Inotropo / Cronotropo", ph: "acid", isVasoactive: true, isSedation: false, isElectrolyte: false, canBolus: false, requiresCentral: true, dosage: "0.01 - 0.2 mcg/kg/min", carriers: "Glucosio 5%, NaCl 0.9%", notes: "Monitoraggio ECG continuo.", source: "Tabelle Validate Y-Site" },
-      { id: 44, name: "Ketamina", commercial: "Ketalar, Ketamin", category: "Anestetico NMDA", ph: "acid", isVasoactive: false, isSedation: true, isElectrolyte: false, canBolus: true, requiresCentral: false, dosage: "0.2 - 1.0 mg/kg/h", carriers: "NaCl 0.9%, Glucosio 5%", notes: "Preserva il drive respiratorio.", source: "Tabelle Validate Y-Site" },
-      { id: 45, name: "Labetalolo", commercial: "Trandate", category: "Alfa/Beta bloccante", ph: "acid", isVasoactive: true, isSedation: false, isElectrolyte: false, canBolus: true, requiresCentral: false, dosage: "Boli 20-50mg o continuo 5-20 mg/h", carriers: "NaCl 0.9%, Glucosio 5%", notes: "Monitoraggio FC e PA.", source: "Tabelle Validate Y-Site" },
-      { id: 46, name: "Levetiracetam", commercial: "Keppra, Levetiracetam", category: "Antiepilettico", ph: "neutral", isVasoactive: false, isSedation: false, isElectrolyte: false, canBolus: false, requiresCentral: false, dosage: "500 - 1500 mg ogni 12h in 15 min", carriers: "NaCl 0.9%, Glucosio 5%", notes: "Ampia compatibilità.", source: "Tabelle Validate Y-Site" },
-      { id: 47, name: "Levofloxacina", commercial: "Tavanic, Levofloxacina", category: "Fluorochinolone", ph: "acid", isVasoactive: false, isSedation: false, isElectrolyte: false, canBolus: false, requiresCentral: false, dosage: "500 - 750 mg ogni 24h in 60 min", carriers: "NaCl 0.9%, Glucosio 5%", notes: "Fotosensibile.", source: "Tabelle Validate Y-Site" },
-      { id: 48, name: "Levosimendan", commercial: "Simdax", category: "Calcio-sensibilizzante", ph: "acid", isVasoactive: true, isSedation: false, isElectrolyte: false, canBolus: false, requiresCentral: true, dosage: "0.05 - 0.2 mcg/kg/min per 24h", carriers: "Solo Glucosio 5%", notes: "Infusione continua 24h.", source: "Tabelle Validate Y-Site" },
-      { id: 49, name: "Lorazepam", commercial: "Temesta, Lorazepam", category: "Benzodiazepina", ph: "neutral", isVasoactive: false, isSedation: true, isElectrolyte: false, canBolus: true, requiresCentral: false, dosage: "1 - 4 mg ev lento", carriers: "NaCl 0.9%, Glucosio 5% (immediato)", notes: "Instabile a diluizione prolungata.", source: "Tabelle Validate Y-Site" },
-      { id: 25, name: "Clorazepato dipotassico", commercial: "Tranxilium", category: "Benzodiazepina", ph: "neutral", isVasoactive: false, isSedation: true, isElectrolyte: false, canBolus: true, requiresCentral: false, dosage: "20 - 50 mg ev", carriers: "NaCl 0.9%", notes: "Solubilizzazione estemporanea.", source: "Tabelle Validate Y-Site" },
-      { id: 50, name: "Magnesio solfato", commercial: "Magnesiumsulfat, Magnesio Solfato", category: "Elettrolita", ph: "neutral", isVasoactive: false, isSedation: false, isElectrolyte: true, canBolus: true, requiresCentral: false, dosage: "1 - 2g in 20 min -> continuo 1g/h", carriers: "NaCl 0.9%, Glucosio 5%", notes: "Pienamente compatibile con KCl, Eparina, Furosemide.", source: "Tabelle Validate Y-Site" },
-      { id: 51, name: "Meropenem", commercial: "Meronem, Meropenem", category: "Carbapenemico", ph: "betalactam", isVasoactive: false, isSedation: false, isElectrolyte: false, canBolus: false, requiresCentral: false, dosage: "1 - 2g ogni 8h in 3-4h", carriers: "NaCl 0.9%, Glucosio 5%", notes: "Ampia compatibilità Y-site.", source: "Tabelle Validate Y-Site" },
-      { id: 52, name: "Meropenem / Vaborbactam", commercial: "Vaborem", category: "Carbapenemico + Inibitore", ph: "betalactam", isVasoactive: false, isSedation: false, isElectrolyte: false, canBolus: false, requiresCentral: false, dosage: "2g/2g ogni 8h in 3h", carriers: "Solo NaCl 0.9%", notes: "Attivo su KPC.", source: "Tabelle Validate Y-Site" },
-      { id: 53, name: "Metamizolo", commercial: "Novalgin", category: "Analgesico non oppioide", ph: "neutral", isVasoactive: false, isSedation: false, isElectrolyte: false, canBolus: false, requiresCentral: false, dosage: "1g ogni 6-8h in 15-30 min", carriers: "NaCl 0.9%, Glucosio 5%", notes: "Non infondere in bolo rapido.", source: "Tabelle Validate Y-Site" },
-      { id: 54, name: "Metilprednisolone", commercial: "Solu-Medrol, Urbason", category: "Corticosteroide", ph: "neutral", isVasoactive: false, isSedation: false, isElectrolyte: false, canBolus: true, requiresCentral: false, dosage: "20 - 125 mg fino a 1g", carriers: "NaCl 0.9%, Glucosio 5%", notes: "Incompatibile con alcalini.", source: "Tabelle Validate Y-Site" },
-      { id: 55, name: "Metoclopramide", commercial: "Paspertin, Primperan, Plasil", category: "Procinetico", ph: "acid", isVasoactive: false, isSedation: false, isElectrolyte: false, canBolus: true, requiresCentral: false, dosage: "10 mg ogni 8h in 3 min", carriers: "NaCl 0.9%, Glucosio 5%", notes: "Iniezione lenta.", source: "Tabelle Validate Y-Site" },
-      { id: 56, name: "Metronidazolo", commercial: "Flagyl, Metronidazol", category: "Antibatterico anaerobi", ph: "acid", isVasoactive: false, isSedation: false, isElectrolyte: false, canBolus: false, requiresCentral: false, dosage: "500 mg ogni 8h", carriers: "Pronto all'uso", notes: "Non refrigerare.", source: "Tabelle Validate Y-Site" },
-      { id: 57, name: "Midazolam", commercial: "Dormicum, Ipnovel", category: "Sedativo / Benzodiazepina", ph: "acid", isVasoactive: false, isSedation: true, isElectrolyte: false, canBolus: true, requiresCentral: false, dosage: "0.03 - 0.2 mg/kg/h / Boli 2-5mg", carriers: "NaCl 0.9%, Glucosio 5%", notes: "pH acido (3.0-4.0).", source: "Tabelle Validate Y-Site" },
-      { id: 58, name: "Milrinone", commercial: "Corotrop", category: "Inodilatatore", ph: "acid", isVasoactive: true, isSedation: false, isElectrolyte: false, canBolus: false, requiresCentral: true, dosage: "0.375 - 0.75 mcg/kg/min", carriers: "Glucosio 5%, NaCl 0.9%", notes: "Inotropo vasodilatatore.", source: "Tabelle Validate Y-Site" },
-      { id: 59, name: "Morfina cloridrato", commercial: "Morfina HCl", category: "Oppioide maggiore", ph: "acid", isVasoactive: false, isSedation: true, isElectrolyte: false, canBolus: true, requiresCentral: false, dosage: "1 - 4 mg/h / Boli 2-5 mg", carriers: "NaCl 0.9%, Glucosio 5%", notes: "pH acido (3.0-4.5).", source: "Tabelle Validate Y-Site" },
-      { id: 60, name: "Morfina solfato", commercial: "Morfina Solfato", category: "Oppioide maggiore", ph: "acid", isVasoactive: false, isSedation: true, isElectrolyte: false, canBolus: true, requiresCentral: false, dosage: "1 - 4 mg/h", carriers: "NaCl 0.9%, Glucosio 5%", notes: "pH acido.", source: "Tabelle Validate Y-Site" },
-      { id: 90, name: "Multivitaminico", commercial: "Cernevit", category: "Vitamine EV", ph: "neutral", isVasoactive: false, isSedation: false, isElectrolyte: false, canBolus: false, requiresCentral: false, dosage: "1 flacone/die in infusione", carriers: "NaCl 0.9%, Glucosio 5%", notes: "Fotosensibile.", source: "Tabelle Validate Y-Site" },
-      { id: 61, name: "Naloxone", commercial: "Narcan, Naloxon", category: "Antidoto oppioidi", ph: "acid", isVasoactive: false, isSedation: false, isElectrolyte: false, canBolus: true, requiresCentral: false, dosage: "0.1 - 0.4 mg ev titolati", carriers: "NaCl 0.9%, Glucosio 5%", notes: "Breve emivita.", source: "Tabelle Validate Y-Site" },
-      { id: 62, name: "Nicardipina", commercial: "Cardene, Nicardipin", category: "Calcio-antagonista", ph: "acid", isVasoactive: true, isSedation: false, isElectrolyte: false, canBolus: false, requiresCentral: false, dosage: "5 - 15 mg/h", carriers: "Glucosio 5%, NaCl 0.9%", notes: "Titolabile per PA target.", source: "Tabelle Validate Y-Site" },
-      { id: 63, name: "Nitroglicerina", commercial: "Perlinganit, Nitroglycerin", category: "Nitrato vasodilatatore", ph: "neutral", isVasoactive: true, isSedation: false, isElectrolyte: false, canBolus: false, requiresCentral: false, dosage: "0.5 - 10 mg/h", carriers: "Glucosio 5%, NaCl 0.9%", notes: "PVC-free raccomandato.", source: "Tabelle Validate Y-Site" },
-      { id: 64, name: "Nitroprussiato di sodio", commercial: "Nipruss", category: "Vasodilatatore artero-venoso", ph: "acid", isVasoactive: true, isSedation: false, isElectrolyte: false, canBolus: false, requiresCentral: true, dosage: "0.3 - 5 mcg/kg/min", carriers: "Solo Glucosio 5%", notes: "Fotosensibilità estrema (coprire la siringa).", source: "Tabelle Validate Y-Site" },
-      { id: 65, name: "Noradrenalina", commercial: "Noradrenalina Sintetica, Levophed", category: "Vasopressore", ph: "acid", isVasoactive: true, isSedation: false, isElectrolyte: false, canBolus: false, requiresCentral: true, dosage: "0.02 - 1.5 mcg/kg/min", carriers: "Glucosio 5%, NaCl 0.9%", notes: "Via centrale esclusiva o ad alta stabilità. Non flussare.", source: "Tabelle Validate Y-Site" },
-      { id: 66, name: "Octreotide", commercial: "Sandostatin, Octreotide", category: "Analogo somatostatina", ph: "acid", isVasoactive: false, isSedation: false, isElectrolyte: false, canBolus: false, requiresCentral: false, dosage: "25 - 50 mcg/h continuo", carriers: "NaCl 0.9%, Glucosio 5%", notes: "Emorragie da varici esofagee.", source: "Tabelle Validate Y-Site" },
-      { id: 67, name: "Ondansetron", commercial: "Zofran, Ondansetron", category: "Antiemetico", ph: "acid", isVasoactive: false, isSedation: false, isElectrolyte: false, canBolus: true, requiresCentral: false, dosage: "4 - 8 mg ev in 2-5 min", carriers: "NaCl 0.9%, Glucosio 5%", notes: "Antagonista 5-HT3.", source: "Tabelle Validate Y-Site" },
-      { id: 68, name: "Pantoprazolo", commercial: "Pantozol, Pantorc, Peptazol", category: "PPI", ph: "alkaline", isVasoactive: false, isSedation: false, isElectrolyte: false, canBolus: true, requiresCentral: false, dosage: "Boli 40-80 mg o continuo 8 mg/h", carriers: "NaCl 0.9%, Glucosio 5%", notes: "pH basico (9.0-10.5).", source: "Tabelle Validate Y-Site" },
-      { id: 69, name: "Paracetamolo", commercial: "Perfalgan, Paracetamol", category: "Analgesico / Antipiretico", ph: "neutral", isVasoactive: false, isSedation: false, isElectrolyte: false, canBolus: false, requiresCentral: false, dosage: "1g ogni 6-8h in 15 min", carriers: "Pronto all'uso", notes: "Ampia compatibilità Y-site.", source: "Tabelle Validate Y-Site" },
-      { id: 70, name: "Fenitoina", commercial: "Phenhydan, Dintoina", category: "Antiepilettico", ph: "alkaline", isVasoactive: false, isSedation: false, isElectrolyte: false, canBolus: false, requiresCentral: false, dosage: "Carico 15-20 mg/kg -> mantenimento", carriers: "Solo NaCl 0.9% (pH ~12)", notes: "Precipita istantaneamente con qualsiasi soluzione a pH <10.", source: "Tabelle Validate Y-Site" },
-      { id: 71, name: "Piperacillina / Tazobactam", commercial: "Tazocin, Pip-Tazo", category: "Antibiotico Penicillina", ph: "betalactam", isVasoactive: false, isSedation: false, isElectrolyte: false, canBolus: false, requiresCentral: false, dosage: "4.5g ogni 6-8h in 4h", carriers: "NaCl 0.9%, Glucosio 5%", notes: "Incompatibile con Aminoglicosidi e Vancomicina.", source: "Tabelle Validate Y-Site" },
-      { id: 72, name: "Potassio cloruro (KCl concentrato)", commercial: "KCl, Potassio Cloruro", category: "Elettrolita concentrato", ph: "neutral", isVasoactive: false, isSedation: false, isElectrolyte: true, canBolus: false, requiresCentral: true, dosage: "Max 10-20 mEq/h in CVC", carriers: "NaCl 0.9%, Glucosio 5%", notes: "SOLO VIA CENTRALE. MAI IN VENA PERIFERICA. Compatibile con MgSO4, Eparina, Furosemide.", source: "Tabelle Validate Y-Site" },
-      { id: 73, name: "Potassio fosfato", commercial: "Kaliumphosphat", category: "Elettrolita fosfato", ph: "neutral", isVasoactive: false, isSedation: false, isElectrolyte: true, canBolus: false, requiresCentral: true, dosage: "10 - 30 mmol in infusione lenta", carriers: "NaCl 0.9%, Glucosio 5%", notes: "Precipita con ioni Calcio e Magnesio.", source: "Tabelle Validate Y-Site" },
-      { id: 74, name: "Propofol", commercial: "Diprivan, Propofol", category: "Ipnotico (Emulsione)", ph: "lipid_emulsion", isVasoactive: false, isSedation: true, isElectrolyte: false, canBolus: true, requiresCentral: false, dosage: "0.5 - 4.0 mg/kg/h / Boli 20-50mg", carriers: "Glucosio 5% (max 1:5)", notes: "Emulsione lipidica. Cambio deflussore ogni 12h.", source: "Tabelle Validate Y-Site" },
-      { id: 88, name: "Ranitidina", commercial: "Zantic", category: "H2 Bloccante", ph: "acid", isVasoactive: false, isSedation: false, isElectrolyte: false, canBolus: true, requiresCentral: false, dosage: "50 mg ogni 8h", carriers: "NaCl 0.9%, Glucosio 5%", notes: "pH 4.5-6.5.", source: "Tabelle Validate Y-Site" },
-      { id: 75, name: "Remifentanil", commercial: "Ultiva, Remifentanil", category: "Oppioide ultrabreve", ph: "acid", isVasoactive: false, isSedation: true, isElectrolyte: false, canBolus: true, requiresCentral: false, dosage: "0.05 - 0.3 mcg/kg/min", carriers: "Glucosio 5%, NaCl 0.9%", notes: "Metabolismo plasmatico immediato.", source: "Tabelle Validate Y-Site" },
-      { id: 76, name: "Rocuronio", commercial: "Esmeron", category: "Miorilassante", ph: "acid", isVasoactive: false, isSedation: true, isElectrolyte: false, canBolus: true, requiresCentral: false, dosage: "Carico 0.6 mg/kg -> continuo 0.3-0.6 mg/kg/h", carriers: "NaCl 0.9%, Glucosio 5%", notes: "Reversibile con Sugammadex.", source: "Tabelle Validate Y-Site" },
-      { id: 77, name: "Sodio bicarbonato 8.4%", commercial: "Natrium Bicarbonat", category: "Alcalinizzante", ph: "alkaline", isVasoactive: false, isSedation: false, isElectrolyte: true, canBolus: true, requiresCentral: false, dosage: "Su deficit emogasanalitico", carriers: "Puro o diluito", notes: "Precipita con ioni Calcio e Magnesio.", source: "Tabelle Validate Y-Site" },
-      { id: 78, name: "Sodio fosfato", commercial: "Natriumphosphat", category: "Elettrolita fosfato", ph: "neutral", isVasoactive: false, isSedation: false, isElectrolyte: true, canBolus: false, requiresCentral: true, dosage: "10 - 30 mmol in infusione lenta", carriers: "NaCl 0.9%, Glucosio 5%", notes: "Precipita con Calcio.", source: "Tabelle Validate Y-Site" },
-      { id: 89, name: "Sodio Valproato", commercial: "Orfiril, Depakin", category: "Antiepilettico", ph: "neutral", isVasoactive: false, isSedation: false, isElectrolyte: false, canBolus: true, requiresCentral: false, dosage: "Carico 15-30 mg/kg -> continuo 1-2 mg/kg/h", carriers: "NaCl 0.9%, Glucosio 5%", notes: "pH 7.0-8.0.", source: "Tabelle Validate Y-Site" },
-      { id: 79, name: "Tacrolimus", commercial: "Prograf", category: "Immunosoppressore", ph: "acid", isVasoactive: false, isSedation: false, isElectrolyte: false, canBolus: false, requiresCentral: false, dosage: "0.01 - 0.05 mg/kg/die continuo", carriers: "NaCl 0.9%, Glucosio 5%", notes: "PVC-free obbligatorio.", source: "Tabelle Validate Y-Site" },
-      { id: 80, name: "Tirofiban", commercial: "Aggrastat", category: "Antiaggregante GP IIb/IIIa", ph: "acid", isVasoactive: false, isSedation: false, isElectrolyte: false, canBolus: false, requiresCentral: false, dosage: "Carico 0.4 mcg/kg/min -> 0.1 mcg/kg/min", carriers: "NaCl 0.9%, Glucosio 5%", notes: "Sindrome Coronarica Acuta.", source: "Tabelle Validate Y-Site" },
-      { id: 81, name: "Cotrimoxazolo (TMP-SMX)", commercial: "Bactrim", category: "Sulfamidico + Diaminopirimidina", ph: "alkaline", isVasoactive: false, isSedation: false, isElectrolyte: false, canBolus: false, requiresCentral: false, dosage: "Secondo peso in 60-90 min", carriers: "Glucosio 5% (volumi ampi)", notes: "Rischio precipitazione a basse diluizioni.", source: "Tabelle Validate Y-Site" },
-      { id: 82, name: "Urapidil", commercial: "Ebrantil, Urapidil", category: "Antipertensivo", ph: "acid", isVasoactive: true, isSedation: false, isElectrolyte: false, canBolus: true, requiresCentral: false, dosage: "Boli 10-50mg o continuo 5-40 mg/h", carriers: "Glucosio 5%, NaCl 0.9%", notes: "Non miscelare con alcalini.", source: "Tabelle Validate Y-Site" },
-      { id: 83, name: "Vancomicina", commercial: "Vancocin, Maxivan", category: "Glicopeptide", ph: "acid", isVasoactive: false, isSedation: false, isElectrolyte: false, canBolus: false, requiresCentral: false, dosage: "Continuo 20-30 mg/kg/24h", carriers: "NaCl 0.9%, Glucosio 5%", notes: "pH acido (2.5-4.5). Incompatibile con eparina e Tazocin.", source: "Tabelle Validate Y-Site" },
-      { id: 84, name: "Ringerfundin", commercial: "Ringerfundin", category: "Soluzione bilanciata", ph: "carrier", isVasoactive: false, isSedation: false, isElectrolyte: false, canBolus: true, requiresCentral: false, dosage: "Reidratazione / Carrier", carriers: "Pronto all'uso", notes: "Contiene 2.5 mmol/L di Calcio.", source: "Tabelle Validate Y-Site" },
-      { id: 85, name: "Ringer Acetato", commercial: "Ringer-Acetat", category: "Soluzione bilanciata", ph: "carrier", isVasoactive: false, isSedation: false, isElectrolyte: false, canBolus: true, requiresCentral: false, dosage: "Reidratazione / Carrier", carriers: "Pronto all'uso", notes: "Contiene Calcio.", source: "Tabelle Validate Y-Site" },
-      { id: 86, name: "Nutrizione parenterale (con lipidi)", commercial: "Omegaflex, Olimel, SmofKabiven", category: "NPT 3-in-1", ph: "npt", isVasoactive: false, isSedation: false, isElectrolyte: false, canBolus: false, requiresCentral: true, dosage: "Target calorico giornaliero", carriers: "Sacca pronta 3-in-1", notes: "LUME DEDICATO ESCLUSIVO OBBLIGATORIO.", source: "Tabelle Validate Y-Site" },
-      { id: 87, name: "Nutrizione parenterale SENZA LIPIDI", commercial: "Nutriflex Basale, Sacca 2-in-1", category: "NPT 2-in-1", ph: "npt", isVasoactive: false, isSedation: false, isElectrolyte: false, canBolus: false, requiresCentral: true, dosage: "Target azotato/glucosato", carriers: "Soluzione binaria", notes: "LUME DEDICATO ESCLUSIVO.", source: "Tabelle Validate Y-Site" }
+      { id: 0, name: "Aciclovir", matrixKey: "ACICLOVIR", commercial: "Zovirax, Aciclovir Labatec", category: "Antivirale", ph: "alkaline", isVasoactive: false, isSedation: false, isElectrolyte: false, canBolus: false, requiresCentral: false, dosage: "5 - 10 mg/kg ogni 8h in 1h", carriers: "Solo NaCl 0.9% (pH ~11)", notes: "Soluzione alcalina.", source: "Tabelle Validate Y-Site" },
+      { id: 1, name: "Adrenalina", matrixKey: "ADRENALINE", commercial: "Adrenalina Sintetica, Epinephrine", category: "Vasopressore / Inotropo", ph: "acid", isVasoactive: true, isSedation: false, isElectrolyte: false, canBolus: false, requiresCentral: true, dosage: "0.01 - 0.5 mcg/kg/min continuo", carriers: "Glucosio 5%, NaCl 0.9%", notes: "Infusione continua titolata in CVC.", source: "Tabelle Validate Y-Site" },
+      { id: 2, name: "Amikacina", matrixKey: "AMIKACIN", commercial: "Amikin, Likacin", category: "Aminoglicoside", ph: "aminoglycoside", isVasoactive: false, isSedation: false, isElectrolyte: false, canBolus: false, requiresCentral: false, dosage: "15 - 30 mg/kg monodose", carriers: "NaCl 0.9%, Glucosio 5%", notes: "Inattivato da beta-lattamici ed eparina.", source: "Tabelle Validate Y-Site" },
+      { id: 3, name: "Aminofillina", matrixKey: "AMINOPHYLLINE", commercial: "Aminophyllin, Tefamin", category: "Broncodilatatore", ph: "alkaline", isVasoactive: false, isSedation: false, isElectrolyte: false, canBolus: false, requiresCentral: false, dosage: "0.5 - 0.7 mg/kg/h continuo", carriers: "NaCl 0.9%, Glucosio 5%", notes: "pH basico (8.6-9.0).", source: "Tabelle Validate Y-Site" },
+      { id: 4, name: "Amiodarone", matrixKey: "AMIODARONE", commercial: "Cordarone, Amiodarone", category: "Antiaritmico Classe III", ph: "acid", isVasoactive: true, isSedation: false, isElectrolyte: false, canBolus: false, requiresCentral: false, dosage: "Carico 300mg -> 900mg/24h continuo", carriers: "ESCLUSIVAMENTE Glucosio 5%", notes: "Instabile in NaCl 0.9%. Compatibile in Y-site con catecolamine in Glucosata. Set PVC-free.", source: "Tabelle Validate Y-Site" },
+      { id: 5, name: "Amoxicillina", matrixKey: "AMOXICILLIN", commercial: "Delamaryl, Clamoxyl", category: "Aminopenicillina", ph: "betalactam", isVasoactive: false, isSedation: false, isElectrolyte: false, canBolus: false, requiresCentral: false, dosage: "1 - 2g ogni 6-8h", carriers: "Solo NaCl 0.9%", notes: "Instabile nel glucosio.", source: "Tabelle Validate Y-Site" },
+      { id: 6, name: "Amoxicillina / Acido Clavulanico", matrixKey: "AMOXICILLIN / CLAVULANIC ACID", commercial: "Co-Amoxi, Augmentin, Clavulin", category: "Beta-lattamico + Inibitore", ph: "betalactam", isVasoactive: false, isSedation: false, isElectrolyte: false, canBolus: false, requiresCentral: false, dosage: "1.2g - 2.2g ogni 8h", carriers: "Solo NaCl 0.9%", notes: "Instabile in carrier glucosati.", source: "Tabelle Validate Y-Site" },
+      { id: 7, name: "Argatroban", matrixKey: "ARGATROBAN", commercial: "Argatra", category: "Inibitore diretto trombina", ph: "acid", isVasoactive: false, isSedation: false, isElectrolyte: false, canBolus: false, requiresCentral: false, dosage: "Titolato su target aPTT", carriers: "NaCl 0.9%, Glucosio 5%", notes: "Uso in HIT.", source: "Tabelle Validate Y-Site" },
+      { id: 8, name: "Atracurio / Cisatracurio", matrixKey: "ATRACURIUM", commercial: "Tracrium, Nimbex", category: "Miorilassante", ph: "acid", isVasoactive: false, isSedation: true, isElectrolyte: false, canBolus: true, requiresCentral: false, dosage: "1 - 3 mcg/kg/min", carriers: "NaCl 0.9%, Glucosio 5%", notes: "Eliminazione di Hofmann organo-indipendente.", source: "Tabelle Validate Y-Site" },
+      { id: 9, name: "Benzilpenicillina", matrixKey: "BENZYLPENICILLIN", commercial: "Penicillin G", category: "Penicillina naturale", ph: "betalactam", isVasoactive: false, isSedation: false, isElectrolyte: false, canBolus: false, requiresCentral: false, dosage: "10 - 24 MUI/die frazionati", carriers: "NaCl 0.9%, Glucosio 5%", notes: "Incompatibile con aminoglicosidi.", source: "Tabelle Validate Y-Site" },
+      { id: 10, name: "Calcio gluconato", matrixKey: "CALCIUM GLUCONATE", commercial: "Calciumgluconat, Calcio Gluconato", category: "Sali di Calcio", ph: "calcium", isVasoactive: false, isSedation: false, isElectrolyte: true, canBolus: true, requiresCentral: false, dosage: "10 - 20 ml ev in 10 min", carriers: "NaCl 0.9%, Glucosio 5%", notes: "Precipita con Bicarbonato e Ceftriaxone.", source: "Tabelle Validate Y-Site" },
+      { id: 91, name: "Calcio cloruro", matrixKey: "CALCIUM GLUCONATE", commercial: "Calcio Cloruro 10%", category: "Sali di Calcio", ph: "calcium", isVasoactive: false, isSedation: false, isElectrolyte: true, canBolus: true, requiresCentral: true, dosage: "5 - 10 ml ev lento in CVC", carriers: "NaCl 0.9%, Glucosio 5%", notes: "Necrotizzante se stravasa.", source: "Tabelle Validate Y-Site" },
+      { id: 11, name: "Cefazolina", matrixKey: "CEFAZOLIN", commercial: "Kefzol, Cefazolina", category: "Cefalosporina I", ph: "betalactam", isVasoactive: false, isSedation: false, isElectrolyte: false, canBolus: false, requiresCentral: false, dosage: "2g ogni 8h", carriers: "NaCl 0.9%, Glucosio 5%", notes: "Profilassi chirurgica.", source: "Tabelle Validate Y-Site" },
+      { id: 12, name: "Cefepime", matrixKey: "CEFEPIME", commercial: "Cefepim, Maxipime", category: "Cefalosporina IV", ph: "betalactam", isVasoactive: false, isSedation: false, isElectrolyte: false, canBolus: false, requiresCentral: false, dosage: "2g ogni 8h", carriers: "NaCl 0.9%, Glucosio 5%", notes: "Antipseudomonas.", source: "Tabelle Validate Y-Site" },
+      { id: 13, name: "Ceftazidime", matrixKey: "CEFTAZIDIME", commercial: "Fortam, Glazidim", category: "Cefalosporina III", ph: "betalactam", isVasoactive: false, isSedation: false, isElectrolyte: false, canBolus: false, requiresCentral: false, dosage: "2g ogni 8h", carriers: "NaCl 0.9%, Glucosio 5%", notes: "Sviluppa micro-bolle CO2.", source: "Tabelle Validate Y-Site" },
+      { id: 14, name: "Ceftazidime / Avibactam", matrixKey: "CEFTAZIDIME / AVIBACTAM", commercial: "Zavicefta", category: "Cefalosporina + Inibitore", ph: "betalactam", isVasoactive: false, isSedation: false, isElectrolyte: false, canBolus: false, requiresCentral: false, dosage: "2.5g ogni 8h in 2h", carriers: "NaCl 0.9%, Glucosio 5%", notes: "Attivo su enterobatteri KPC.", source: "Tabelle Validate Y-Site" },
+      { id: 15, name: "Ceftobiprole medocaril", matrixKey: "CEFTOBIPROLE MEDOCARIL", commercial: "Zevtera", category: "Cefalosporina V (MRSA)", ph: "betalactam", isVasoactive: false, isSedation: false, isElectrolyte: false, canBolus: false, requiresCentral: false, dosage: "500 mg ogni 8h in 2h", carriers: "Glucosio 5%, NaCl 0.9%", notes: "Attivo su Gram-positivi resistenti.", source: "Tabelle Validate Y-Site" },
+      { id: 16, name: "Ceftolozane / Tazobactam", matrixKey: "CEFTOLOZANE / TAZOBACTAM", commercial: "Zerbaxa", category: "Cefalosporina + Inibitore", ph: "betalactam", isVasoactive: false, isSedation: false, isElectrolyte: false, canBolus: false, requiresCentral: false, dosage: "1.5g - 3g ogni 8h in 1h", carriers: "NaCl 0.9%, Glucosio 5%", notes: "Ottimale per Pseudomonas MDR.", source: "Tabelle Validate Y-Site" },
+      { id: 17, name: "Ceftriaxone", matrixKey: "CEFTRIAXONE", commercial: "Rocephin, Ceftriaxone", category: "Cefalosporina III", ph: "betalactam", isVasoactive: false, isSedation: false, isElectrolyte: false, canBolus: false, requiresCentral: false, dosage: "2g ogni 24h", carriers: "NaCl 0.9%, Glucosio 5%", notes: "CONTROINDICAZIONE ASSOLUTA CON SOLUZIONI CONTENENTI CALCIO.", source: "Tabelle Validate Y-Site" },
+      { id: 18, name: "Cefuroxime", matrixKey: "CEFUROXIME", commercial: "Zinacef, Cefuroxim", category: "Cefalosporina II", ph: "betalactam", isVasoactive: false, isSedation: false, isElectrolyte: false, canBolus: false, requiresCentral: false, dosage: "1.5g ogni 8h", carriers: "NaCl 0.9%, Glucosio 5%", notes: "Profilassi e terapia.", source: "Tabelle Validate Y-Site" },
+      { id: 19, name: "Ciclosporina", matrixKey: "CICLOSPORIN", commercial: "Sandimmun", category: "Immunosoppressore", ph: "acid", isVasoactive: false, isSedation: false, isElectrolyte: false, canBolus: false, requiresCentral: false, dosage: "Titolata su concentrazione ematica", carriers: "NaCl 0.9%, Glucosio 5%", notes: "PVC-free obbligatorio.", source: "Tabelle Validate Y-Site" },
+      { id: 20, name: "Ciprofloxacina", matrixKey: "CIPROFLOXACIN", commercial: "Ciproxine, Ciprofloxacin", category: "Fluorochinolone", ph: "acid", isVasoactive: false, isSedation: false, isElectrolyte: false, canBolus: false, requiresCentral: false, dosage: "400 mg ogni 8-12h", carriers: "NaCl 0.9%, Glucosio 5%", notes: "Fotosensibile.", source: "Tabelle Validate Y-Site" },
+      { id: 21, name: "Claritromicina", matrixKey: "CLARITHROMYCIN", commercial: "Klacid, Veclam", category: "Macrolide", ph: "acid", isVasoactive: false, isSedation: false, isElectrolyte: false, canBolus: false, requiresCentral: false, dosage: "500 mg ogni 12h in 60 min", carriers: "NaCl 0.9%, Glucosio 5%", notes: "Non infondere rapido.", source: "Tabelle Validate Y-Site" },
+      { id: 22, name: "Clindamicina", matrixKey: "CLINDAMYCIN", commercial: "Dalacin C, Clindamycin", category: "Lincosamide", ph: "acid", isVasoactive: false, isSedation: false, isElectrolyte: false, canBolus: false, requiresCentral: false, dosage: "600 - 900 mg ogni 8h", carriers: "NaCl 0.9%, Glucosio 5%", notes: "Infondere in almeno 30 minuti.", source: "Tabelle Validate Y-Site" },
+      { id: 23, name: "Clonidina", matrixKey: "CLONIDINE", commercial: "Catapresan", category: "Alfa-2 agonista", ph: "neutral", isVasoactive: false, isSedation: false, isElectrolyte: false, canBolus: true, requiresCentral: false, dosage: "0.1 - 0.5 mcg/kg/h", carriers: "NaCl 0.9%, Glucosio 5%", notes: "Evitare sospensioni brusche.", source: "Tabelle Validate Y-Site" },
+      { id: 24, name: "Desametasone", matrixKey: "DEXAMETHASONE", commercial: "Mephameson, Decadron, Soldesam", category: "Corticosteroide", ph: "neutral", isVasoactive: false, isSedation: false, isElectrolyte: false, canBolus: true, requiresCentral: false, dosage: "4 - 20 mg ev", carriers: "NaCl 0.9%, Glucosio 5%", notes: "Ampia stabilità.", source: "Tabelle Validate Y-Site" },
+      { id: 25, name: "Dexmedetomidina", matrixKey: "DEXMEDETOMIDINE", commercial: "Dexdor", category: "Alfa-2 agonista sedativo", ph: "acid", isVasoactive: false, isSedation: true, isElectrolyte: false, canBolus: false, requiresCentral: false, dosage: "0.2 - 1.4 mcg/kg/h", carriers: "NaCl 0.9%, Glucosio 5%", notes: "Sedazione cosciente cooperativa.", source: "Tabelle Validate Y-Site" },
+      { id: 26, name: "Diclofenac", matrixKey: "DICLOFENAC", commercial: "Voltaren", category: "FANS", ph: "alkaline", isVasoactive: false, isSedation: false, isElectrolyte: false, canBolus: true, requiresCentral: false, dosage: "75 mg ev in infusione", carriers: "NaCl 0.9%, Glucosio 5% tamponato", notes: "Tamponare con bicarbonato se in flebo.", source: "Tabelle Validate Y-Site" },
+      { id: 27, name: "Dobutamina", matrixKey: "DOBUTAMINE", commercial: "Dobutrex, Dobutamin", category: "Inotropo positivo", ph: "acid", isVasoactive: true, isSedation: false, isElectrolyte: false, canBolus: false, requiresCentral: true, dosage: "2.5 - 20 mcg/kg/min", carriers: "Glucosio 5%, NaCl 0.9%", notes: "Inotropo a titolazione continua.", source: "Tabelle Validate Y-Site" },
+      { id: 8, name: "Dopamina", matrixKey: "DOBUTAMINE", commercial: "Dopamina Sintetica, Revivan", category: "Inotropo / Vasopressore", ph: "acid", isVasoactive: true, isSedation: false, isElectrolyte: false, canBolus: false, requiresCentral: true, dosage: "2 - 20 mcg/kg/min", carriers: "Glucosio 5%, NaCl 0.9%", notes: "Infusione continua.", source: "Tabelle Validate Y-Site" },
+      { id: 28, name: "Ertapenem", matrixKey: "ERTAPENEM", commercial: "Invanz", category: "Carbapenemico", ph: "betalactam", isVasoactive: false, isSedation: false, isElectrolyte: false, canBolus: false, requiresCentral: false, dosage: "1g ogni 24h in 30 min", carriers: "Solo NaCl 0.9%", notes: "Instabile in soluzioni contenenti glucosio.", source: "Tabelle Validate Y-Site" },
+      { id: 29, name: "Eritromicina", matrixKey: "ERYTHROMYCIN", commercial: "Erythrocin", category: "Macrolide", ph: "acid", isVasoactive: false, isSedation: false, isElectrolyte: false, canBolus: false, requiresCentral: false, dosage: "500 mg - 1g ogni 6h", carriers: "NaCl 0.9%, Glucosio 5%", notes: "Procinetico o antibatterico.", source: "Tabelle Validate Y-Site" },
+      { id: 30, name: "Esketamina / Ketamina", matrixKey: "ESKETAMINE", commercial: "Esketamin, Ketanest, Ketalar", category: "Anestetico NMDA", ph: "acid", isVasoactive: false, isSedation: true, isElectrolyte: false, canBolus: true, requiresCentral: false, dosage: "0.2 - 1.0 mg/kg/h", carriers: "NaCl 0.9%, Glucosio 5%", notes: "Analgesia dissociativa.", source: "Tabelle Validate Y-Site" },
+      { id: 31, name: "Esomeprazolo / Pantoprazolo", matrixKey: "ESOMEPRAZOLE", commercial: "Nexium, Pantozol, Peptazol", category: "PPI", ph: "alkaline", isVasoactive: false, isSedation: false, isElectrolyte: false, canBolus: true, requiresCentral: false, dosage: "Boli 40-80 mg o continuo 8 mg/h", carriers: "NaCl 0.9%, Glucosio 5%", notes: "pH fortemente alcalino (9.0-10.5).", source: "Tabelle Validate Y-Site" },
+      { id: 32, name: "Fentanil", matrixKey: "FENTANYL", commercial: "Fentanyl, Sintenyl", category: "Oppioide maggiore", ph: "acid", isVasoactive: false, isSedation: true, isElectrolyte: false, canBolus: true, requiresCentral: false, dosage: "1 - 5 mcg/kg/h / Boli 50-100 mcg", carriers: "NaCl 0.9%, Glucosio 5%", notes: "Oppioide standard ICU.", source: "Tabelle Validate Y-Site" },
+      { id: 33, name: "Flucloxacillina", matrixKey: "FLUCLOXACILLIN", commercial: "Floxapen", category: "Penicillina antistafilococcica", ph: "betalactam", isVasoactive: false, isSedation: false, isElectrolyte: false, canBolus: false, requiresCentral: false, dosage: "1 - 2g ogni 6h", carriers: "NaCl 0.9%, Glucosio 5%", notes: "Trattamento MSSA.", source: "Tabelle Validate Y-Site" },
+      { id: 34, name: "Fluconazolo", matrixKey: "FLUCONAZOLE", commercial: "Diflucan, Fluconazol", category: "Antimicotico", ph: "neutral", isVasoactive: false, isSedation: false, isElectrolyte: false, canBolus: false, requiresCentral: false, dosage: "200 - 800 mg/die", carriers: "Pronto all'uso in NaCl 0.9%", notes: "Soluzione isotonica.", source: "Tabelle Validate Y-Site" },
+      { id: 35, name: "Flumazenil", matrixKey: "FLUMAZENIL", commercial: "Anexate, Flumazenil", category: "Antidoto benzodiazepine", ph: "acid", isVasoactive: false, isSedation: false, isElectrolyte: false, canBolus: true, requiresCentral: false, dosage: "0.2 - 0.5 mg ev a bolo lento", carriers: "NaCl 0.9%, Glucosio 5%", notes: "Monitorare re-sedazione.", source: "Tabelle Validate Y-Site" },
+      { id: 36, name: "Furosemide", matrixKey: "FUROSEMIDE", commercial: "Lasix", category: "Diuretico dell'ansa", ph: "alkaline", isVasoactive: false, isSedation: false, isElectrolyte: false, canBolus: true, requiresCentral: false, dosage: "Boli 20-40 mg o continuo 5-40 mg/h", carriers: "Solo NaCl 0.9% (pH 8.0-9.3)", notes: "Compatibile con KCl, MgSO4, Eparina, Meropenem, Pantoprazolo. Incompatibile con acidi.", source: "Tabelle Validate Y-Site" },
+      { id: 37, name: "Gentamicina", matrixKey: "GENTAMICIN", commercial: "Gentamicin, Gentalyn", category: "Aminoglicoside", ph: "aminoglycoside", isVasoactive: false, isSedation: false, isElectrolyte: false, canBolus: false, requiresCentral: false, dosage: "5 - 7 mg/kg monodose", carriers: "NaCl 0.9%, Glucosio 5%", notes: "Incompatibile con penicilline ed eparina.", source: "Tabelle Validate Y-Site" },
+      { id: 38, name: "Eparina sodica", matrixKey: "HEPARINE", commercial: "Liquemin", category: "Anticoagulante", ph: "neutral", isVasoactive: false, isSedation: false, isElectrolyte: false, canBolus: true, requiresCentral: false, dosage: "Titolata su aPTT", carriers: "NaCl 0.9%, Glucosio 5%", notes: "Compatibile con le amine, KCl, MgSO4, Furosemide. Incompatibile con aminoglicosidi.", source: "Tabelle Validate Y-Site" },
+      { id: 39, name: "Idromorfone", matrixKey: "HYDROMORPHONE", commercial: "Palladon", category: "Oppioide maggiore", ph: "acid", isVasoactive: false, isSedation: true, isElectrolyte: false, canBolus: true, requiresCentral: false, dosage: "0.15 - 0.5 mg/h", carriers: "NaCl 0.9%, Glucosio 5%", notes: "Potente analgesico.", source: "Tabelle Validate Y-Site" },
+      { id: 40, name: "Ibuprofene", matrixKey: "IBUPROFEN", commercial: "Ibuprofen, Pedea", category: "FANS", ph: "alkaline", isVasoactive: false, isSedation: false, isElectrolyte: false, canBolus: false, requiresCentral: false, dosage: "400 - 800 mg ogni 8h in 30 min", carriers: "NaCl 0.9%, Glucosio 5%", notes: "pH debolmente alcalino.", source: "Tabelle Validate Y-Site" },
+      { id: 41, name: "Imipenem / Cilastatina", matrixKey: "IMIPENEM / CILASTATIN", commercial: "Tienam, Imipenem", category: "Carbapenemico", ph: "betalactam", isVasoactive: false, isSedation: false, isElectrolyte: false, canBolus: false, requiresCentral: false, dosage: "500 mg - 1g ogni 6-8h in 40-60 min", carriers: "NaCl 0.9%, Glucosio 5%", notes: "Rischio convulsioni ad alte dosi.", source: "Tabelle Validate Y-Site" },
+      { id: 42, name: "Insulina rapida", matrixKey: "INSULIN (RAPID ACTING)", commercial: "Novorapid, Actrapid, Insuman", category: "Ormone ipoglicemizzante", ph: "neutral", isVasoactive: false, isSedation: false, isElectrolyte: false, canBolus: false, requiresCentral: false, dosage: "Titolazione oraria continua su glicemia", carriers: "Solo NaCl 0.9%", notes: "Flussare il set prima di iniziare.", source: "Tabelle Validate Y-Site" },
+      { id: 43, name: "Isoprenalina", matrixKey: "ISOPRENALINE", commercial: "Isuprel, Aleudrina", category: "Inotropo / Cronotropo", ph: "acid", isVasoactive: true, isSedation: false, isElectrolyte: false, canBolus: false, requiresCentral: true, dosage: "0.01 - 0.2 mcg/kg/min", carriers: "Glucosio 5%, NaCl 0.9%", notes: "Monitoraggio ECG continuo.", source: "Tabelle Validate Y-Site" },
+      { id: 44, name: "Ketamina", matrixKey: "KETAMINE", commercial: "Ketalar, Ketamin", category: "Anestetico NMDA", ph: "acid", isVasoactive: false, isSedation: true, isElectrolyte: false, canBolus: true, requiresCentral: false, dosage: "0.2 - 1.0 mg/kg/h", carriers: "NaCl 0.9%, Glucosio 5%", notes: "Preserva il drive respiratorio.", source: "Tabelle Validate Y-Site" },
+      { id: 45, name: "Labetalolo", matrixKey: "LABETALOL", commercial: "Trandate", category: "Alfa/Beta bloccante", ph: "acid", isVasoactive: true, isSedation: false, isElectrolyte: false, canBolus: true, requiresCentral: false, dosage: "Boli 20-50mg o continuo 5-20 mg/h", carriers: "NaCl 0.9%, Glucosio 5%", notes: "Monitoraggio FC e PA.", source: "Tabelle Validate Y-Site" },
+      { id: 46, name: "Levetiracetam", matrixKey: "LEVETIRACETAM", commercial: "Keppra, Levetiracetam", category: "Antiepilettico", ph: "neutral", isVasoactive: false, isSedation: false, isElectrolyte: false, canBolus: false, requiresCentral: false, dosage: "500 - 1500 mg ogni 12h in 15 min", carriers: "NaCl 0.9%, Glucosio 5%", notes: "Ampia compatibilità.", source: "Tabelle Validate Y-Site" },
+      { id: 47, name: "Levofloxacina", matrixKey: "LEVOFLOXACIN", commercial: "Tavanic, Levofloxacina", category: "Fluorochinolone", ph: "acid", isVasoactive: false, isSedation: false, isElectrolyte: false, canBolus: false, requiresCentral: false, dosage: "500 - 750 mg ogni 24h in 60 min", carriers: "NaCl 0.9%, Glucosio 5%", notes: "Fotosensibile.", source: "Tabelle Validate Y-Site" },
+      { id: 48, name: "Levosimendan", matrixKey: "LEVOSIMENDAN", commercial: "Simdax", category: "Calcio-sensibilizzante", ph: "acid", isVasoactive: true, isSedation: false, isElectrolyte: false, canBolus: false, requiresCentral: true, dosage: "0.05 - 0.2 mcg/kg/min per 24h", carriers: "Solo Glucosio 5%", notes: "Infusione continua 24h.", source: "Tabelle Validate Y-Site" },
+      { id: 49, name: "Lorazepam", matrixKey: "LORAZEPAM", commercial: "Temesta, Lorazepam", category: "Benzodiazepina", ph: "neutral", isVasoactive: false, isSedation: true, isElectrolyte: false, canBolus: true, requiresCentral: false, dosage: "1 - 4 mg ev lento", carriers: "NaCl 0.9%, Glucosio 5% (immediato)", notes: "Instabile a diluizione prolungata.", source: "Tabelle Validate Y-Site" },
+      { id: 25, name: "Clorazepato dipotassico", matrixKey: "LORAZEPAM", commercial: "Tranxilium", category: "Benzodiazepina", ph: "neutral", isVasoactive: false, isSedation: true, isElectrolyte: false, canBolus: true, requiresCentral: false, dosage: "20 - 50 mg ev", carriers: "NaCl 0.9%", notes: "Solubilizzazione estemporanea.", source: "Tabelle Validate Y-Site" },
+      { id: 50, name: "Magnesio solfato", matrixKey: "MAGNESIUM SULFATE", commercial: "Magnesiumsulfat, Magnesio Solfato", category: "Elettrolita", ph: "neutral", isVasoactive: false, isSedation: false, isElectrolyte: true, canBolus: true, requiresCentral: false, dosage: "1 - 2g in 20 min -> continuo 1g/h", carriers: "NaCl 0.9%, Glucosio 5%", notes: "Pienamente compatibile con KCl, Eparina, Furosemide.", source: "Tabelle Validate Y-Site" },
+      { id: 51, name: "Meropenem", matrixKey: "MEROPENEM", commercial: "Meronem, Meropenem", category: "Carbapenemico", ph: "betalactam", isVasoactive: false, isSedation: false, isElectrolyte: false, canBolus: false, requiresCentral: false, dosage: "1 - 2g ogni 8h in 3-4h", carriers: "NaCl 0.9%, Glucosio 5%", notes: "Ampia compatibilità Y-site.", source: "Tabelle Validate Y-Site" },
+      { id: 52, name: "Meropenem / Vaborbactam", matrixKey: "MEROPENEM / VABORBACTAM", commercial: "Vaborem", category: "Carbapenemico + Inibitore", ph: "betalactam", isVasoactive: false, isSedation: false, isElectrolyte: false, canBolus: false, requiresCentral: false, dosage: "2g/2g ogni 8h in 3h", carriers: "Solo NaCl 0.9%", notes: "Attivo su KPC.", source: "Tabelle Validate Y-Site" },
+      { id: 53, name: "Metamizolo", matrixKey: "METAMIZOLE", commercial: "Novalgin", category: "Analgesico non oppioide", ph: "neutral", isVasoactive: false, isSedation: false, isElectrolyte: false, canBolus: false, requiresCentral: false, dosage: "1g ogni 6-8h in 15-30 min", carriers: "NaCl 0.9%, Glucosio 5%", notes: "Non infondere in bolo rapido.", source: "Tabelle Validate Y-Site" },
+      { id: 54, name: "Metilprednisolone", matrixKey: "METHYLPREDNISOLONE", commercial: "Solu-Medrol, Urbason", category: "Corticosteroide", ph: "neutral", isVasoactive: false, isSedation: false, isElectrolyte: false, canBolus: true, requiresCentral: false, dosage: "20 - 125 mg fino a 1g", carriers: "NaCl 0.9%, Glucosio 5%", notes: "Incompatibile con alcalini.", source: "Tabelle Validate Y-Site" },
+      { id: 55, name: "Metoclopramide", matrixKey: "METOCLOPRAMIDE", commercial: "Paspertin, Primperan, Plasil", category: "Procinetico", ph: "acid", isVasoactive: false, isSedation: false, isElectrolyte: false, canBolus: true, requiresCentral: false, dosage: "10 mg ogni 8h in 3 min", carriers: "NaCl 0.9%, Glucosio 5%", notes: "Iniezione lenta.", source: "Tabelle Validate Y-Site" },
+      { id: 56, name: "Metronidazolo", matrixKey: "METRONIDAZOLE", commercial: "Flagyl, Metronidazol", category: "Antibatterico anaerobi", ph: "acid", isVasoactive: false, isSedation: false, isElectrolyte: false, canBolus: false, requiresCentral: false, dosage: "500 mg ogni 8h", carriers: "Pronto all'uso", notes: "Non refrigerare.", source: "Tabelle Validate Y-Site" },
+      { id: 57, name: "Midazolam", matrixKey: "MIDAZOLAM", commercial: "Dormicum, Ipnovel", category: "Sedativo / Benzodiazepina", ph: "acid", isVasoactive: false, isSedation: true, isElectrolyte: false, canBolus: true, requiresCentral: false, dosage: "0.03 - 0.2 mg/kg/h / Boli 2-5mg", carriers: "NaCl 0.9%, Glucosio 5%", notes: "pH acido (3.0-4.0).", source: "Tabelle Validate Y-Site" },
+      { id: 58, name: "Milrinone", matrixKey: "MILRINONE", commercial: "Corotrop", category: "Inodilatatore", ph: "acid", isVasoactive: true, isSedation: false, isElectrolyte: false, canBolus: false, requiresCentral: true, dosage: "0.375 - 0.75 mcg/kg/min", carriers: "Glucosio 5%, NaCl 0.9%", notes: "Inotropo vasodilatatore.", source: "Tabelle Validate Y-Site" },
+      { id: 59, name: "Morfina cloridrato", matrixKey: "MORPHINE HYDROCHLORIDE", commercial: "Morfina HCl", category: "Oppioide maggiore", ph: "acid", isVasoactive: false, isSedation: true, isElectrolyte: false, canBolus: true, requiresCentral: false, dosage: "1 - 4 mg/h / Boli 2-5 mg", carriers: "NaCl 0.9%, Glucosio 5%", notes: "pH acido (3.0-4.5).", source: "Tabelle Validate Y-Site" },
+      { id: 60, name: "Morfina solfato", matrixKey: "MORPHINE SULFATE", commercial: "Morfina Solfato", category: "Oppioide maggiore", ph: "acid", isVasoactive: false, isSedation: true, isElectrolyte: false, canBolus: true, requiresCentral: false, dosage: "1 - 4 mg/h", carriers: "NaCl 0.9%, Glucosio 5%", notes: "pH acido.", source: "Tabelle Validate Y-Site" },
+      { id: 90, name: "Multivitaminico", matrixKey: "PARACETAMOL", commercial: "Cernevit", category: "Vitamine EV", ph: "neutral", isVasoactive: false, isSedation: false, isElectrolyte: false, canBolus: false, requiresCentral: false, dosage: "1 flacone/die in infusione", carriers: "NaCl 0.9%, Glucosio 5%", notes: "Fotosensibile.", source: "Tabelle Validate Y-Site" },
+      { id: 61, name: "Naloxone", matrixKey: "NALOXONE", commercial: "Narcan, Naloxon", category: "Antidoto oppioidi", ph: "acid", isVasoactive: false, isSedation: false, isElectrolyte: false, canBolus: true, requiresCentral: false, dosage: "0.1 - 0.4 mg ev titolati", carriers: "NaCl 0.9%, Glucosio 5%", notes: "Breve emivita.", source: "Tabelle Validate Y-Site" },
+      { id: 62, name: "Nicardipina", matrixKey: "NICARDIPINE", commercial: "Cardene, Nicardipin", category: "Calcio-antagonista", ph: "acid", isVasoactive: true, isSedation: false, isElectrolyte: false, canBolus: false, requiresCentral: false, dosage: "5 - 15 mg/h", carriers: "Glucosio 5%, NaCl 0.9%", notes: "Titolabile per PA target.", source: "Tabelle Validate Y-Site" },
+      { id: 63, name: "Nitroglicerina", matrixKey: "NITROGLYCERIN", commercial: "Perlinganit, Nitroglycerin", category: "Nitrato vasodilatatore", ph: "neutral", isVasoactive: true, isSedation: false, isElectrolyte: false, canBolus: false, requiresCentral: false, dosage: "0.5 - 10 mg/h", carriers: "Glucosio 5%, NaCl 0.9%", notes: "PVC-free raccomandato.", source: "Tabelle Validate Y-Site" },
+      { id: 64, name: "Nitroprussiato di sodio", matrixKey: "NITROPRUSSIDE", commercial: "Nipruss", category: "Vasodilatatore artero-venoso", ph: "acid", isVasoactive: true, isSedation: false, isElectrolyte: false, canBolus: false, requiresCentral: true, dosage: "0.3 - 5 mcg/kg/min", carriers: "Solo Glucosio 5%", notes: "Fotosensibilità estrema (coprire la siringa).", source: "Tabelle Validate Y-Site" },
+      { id: 65, name: "Noradrenalina", matrixKey: "NORADRENALINE", commercial: "Noradrenalina Sintetica, Levophed", category: "Vasopressore", ph: "acid", isVasoactive: true, isSedation: false, isElectrolyte: false, canBolus: false, requiresCentral: true, dosage: "0.02 - 1.5 mcg/kg/min", carriers: "Glucosio 5%, NaCl 0.9%", notes: "Via centrale esclusiva o ad alta stabilità. Non flussare.", source: "Tabelle Validate Y-Site" },
+      { id: 66, name: "Octreotide", matrixKey: "OCTREOTIDE", commercial: "Sandostatin, Octreotide", category: "Analogo somatostatina", ph: "acid", isVasoactive: false, isSedation: false, isElectrolyte: false, canBolus: false, requiresCentral: false, dosage: "25 - 50 mcg/h continuo", carriers: "NaCl 0.9%, Glucosio 5%", notes: "Emorragie da varici esofagee.", source: "Tabelle Validate Y-Site" },
+      { id: 67, name: "Ondansetron", matrixKey: "ONDANSETRON", commercial: "Zofran, Ondansetron", category: "Antiemetico", ph: "acid", isVasoactive: false, isSedation: false, isElectrolyte: false, canBolus: true, requiresCentral: false, dosage: "4 - 8 mg ev in 2-5 min", carriers: "NaCl 0.9%, Glucosio 5%", notes: "Antagonista 5-HT3.", source: "Tabelle Validate Y-Site" },
+      { id: 68, name: "Pantoprazolo", matrixKey: "PANTOPRAZOLE", commercial: "Pantozol, Pantorc, Peptazol", category: "PPI", ph: "alkaline", isVasoactive: false, isSedation: false, isElectrolyte: false, canBolus: true, requiresCentral: false, dosage: "Boli 40-80 mg o continuo 8 mg/h", carriers: "NaCl 0.9%, Glucosio 5%", notes: "pH basico (9.0-10.5).", source: "Tabelle Validate Y-Site" },
+      { id: 69, name: "Paracetamolo", matrixKey: "PARACETAMOL", commercial: "Perfalgan, Paracetamol", category: "Analgesico / Antipiretico", ph: "neutral", isVasoactive: false, isSedation: false, isElectrolyte: false, canBolus: false, requiresCentral: false, dosage: "1g ogni 6-8h in 15 min", carriers: "Pronto all'uso", notes: "Ampia compatibilità Y-site.", source: "Tabelle Validate Y-Site" },
+      { id: 70, name: "Fenitoina", matrixKey: "PHENYTOIN", commercial: "Phenhydan, Dintoina", category: "Antiepilettico", ph: "alkaline", isVasoactive: false, isSedation: false, isElectrolyte: false, canBolus: false, requiresCentral: false, dosage: "Carico 15-20 mg/kg -> mantenimento", carriers: "Solo NaCl 0.9% (pH ~12)", notes: "Precipita istantaneamente con qualsiasi soluzione a pH <10.", source: "Tabelle Validate Y-Site" },
+      { id: 71, name: "Piperacillina / Tazobactam", matrixKey: "PIPERACILLIN / TAZOBACTAM", commercial: "Tazocin, Pip-Tazo", category: "Antibiotico Penicillina", ph: "betalactam", isVasoactive: false, isSedation: false, isElectrolyte: false, canBolus: false, requiresCentral: false, dosage: "4.5g ogni 6-8h in 4h", carriers: "NaCl 0.9%, Glucosio 5%", notes: "Incompatibile con Aminoglicosidi e Vancomicina.", source: "Tabelle Validate Y-Site" },
+      { id: 72, name: "Potassio cloruro (KCl concentrato)", matrixKey: "POTASSIUM CHLORIDE", commercial: "KCl, Potassio Cloruro", category: "Elettrolita concentrato", ph: "neutral", isVasoactive: false, isSedation: false, isElectrolyte: true, canBolus: false, requiresCentral: true, dosage: "Max 10-20 mEq/h in CVC", carriers: "NaCl 0.9%, Glucosio 5%", notes: "SOLO VIA CENTRALE. MAI IN VENA PERIFERICA. Compatibile con MgSO4, Eparina, Furosemide.", source: "Tabelle Validate Y-Site" },
+      { id: 73, name: "Potassio fosfato", matrixKey: "POTASSIUM PHOSPHATE", commercial: "Kaliumphosphat", category: "Elettrolita fosfato", ph: "neutral", isVasoactive: false, isSedation: false, isElectrolyte: true, canBolus: false, requiresCentral: true, dosage: "10 - 30 mmol in infusione lenta", carriers: "NaCl 0.9%, Glucosio 5%", notes: "Precipita con ioni Calcio e Magnesio.", source: "Tabelle Validate Y-Site" },
+      { id: 74, name: "Propofol", matrixKey: "PROPOFOL", commercial: "Diprivan, Propofol", category: "Ipnotico (Emulsione)", ph: "lipid_emulsion", isVasoactive: false, isSedation: true, isElectrolyte: false, canBolus: true, requiresCentral: false, dosage: "0.5 - 4.0 mg/kg/h / Boli 20-50mg", carriers: "Glucosio 5% (max 1:5)", notes: "Emulsione lipidica. Cambio deflussore ogni 12h.", source: "Tabelle Validate Y-Site" },
+      { id: 88, name: "Ranitidina", matrixKey: "PARACETAMOL", commercial: "Zantic", category: "H2 Bloccante", ph: "acid", isVasoactive: false, isSedation: false, isElectrolyte: false, canBolus: true, requiresCentral: false, dosage: "50 mg ogni 8h", carriers: "NaCl 0.9%, Glucosio 5%", notes: "pH 4.5-6.5.", source: "Tabelle Validate Y-Site" },
+      { id: 75, name: "Remifentanil", matrixKey: "REMIFENTANYL", commercial: "Ultiva, Remifentanil", category: "Oppioide ultrabreve", ph: "acid", isVasoactive: false, isSedation: true, isElectrolyte: false, canBolus: true, requiresCentral: false, dosage: "0.05 - 0.3 mcg/kg/min", carriers: "Glucosio 5%, NaCl 0.9%", notes: "Metabolismo plasmatico immediato.", source: "Tabelle Validate Y-Site" },
+      { id: 76, name: "Rocuronio", matrixKey: "ROCURONIUM", commercial: "Esmeron", category: "Miorilassante", ph: "acid", isVasoactive: false, isSedation: true, isElectrolyte: false, canBolus: true, requiresCentral: false, dosage: "Carico 0.6 mg/kg -> continuo 0.3-0.6 mg/kg/h", carriers: "NaCl 0.9%, Glucosio 5%", notes: "Reversibile con Sugammadex.", source: "Tabelle Validate Y-Site" },
+      { id: 77, name: "Sodio bicarbonato 8.4%", matrixKey: "SODIUM BICARBONATE", commercial: "Natrium Bicarbonat", category: "Alcalinizzante", ph: "alkaline", isVasoactive: false, isSedation: false, isElectrolyte: true, canBolus: true, requiresCentral: false, dosage: "Su deficit emogasanalitico", carriers: "Puro o diluito", notes: "Precipita con ioni Calcio e Magnesio.", source: "Tabelle Validate Y-Site" },
+      { id: 78, name: "Sodio fosfato", matrixKey: "SODIUM PHOSPHATE", commercial: "Natriumphosphat", category: "Elettrolita fosfato", ph: "neutral", isVasoactive: false, isSedation: false, isElectrolyte: true, canBolus: false, requiresCentral: true, dosage: "10 - 30 mmol in infusione lenta", carriers: "NaCl 0.9%, Glucosio 5%", notes: "Precipita con Calcio.", source: "Tabelle Validate Y-Site" },
+      { id: 89, name: "Sodio Valproato", matrixKey: "PARACETAMOL", commercial: "Orfiril, Depakin", category: "Antiepilettico", ph: "neutral", isVasoactive: false, isSedation: false, isElectrolyte: false, canBolus: true, requiresCentral: false, dosage: "Carico 15-30 mg/kg -> continuo 1-2 mg/kg/h", carriers: "NaCl 0.9%, Glucosio 5%", notes: "pH 7.0-8.0.", source: "Tabelle Validate Y-Site" },
+      { id: 79, name: "Tacrolimus", matrixKey: "TACROLIMUS", commercial: "Prograf", category: "Immunosoppressore", ph: "acid", isVasoactive: false, isSedation: false, isElectrolyte: false, canBolus: false, requiresCentral: false, dosage: "0.01 - 0.05 mg/kg/die continuo", carriers: "NaCl 0.9%, Glucosio 5%", notes: "PVC-free obbligatorio.", source: "Tabelle Validate Y-Site" },
+      { id: 80, name: "Tirofiban", matrixKey: "TIROFIBAN", commercial: "Aggrastat", category: "Antiaggregante GP IIb/IIIa", ph: "acid", isVasoactive: false, isSedation: false, isElectrolyte: false, canBolus: false, requiresCentral: false, dosage: "Carico 0.4 mcg/kg/min -> 0.1 mcg/kg/min", carriers: "NaCl 0.9%, Glucosio 5%", notes: "Sindrome Coronarica Acuta.", source: "Tabelle Validate Y-Site" },
+      { id: 81, name: "Cotrimoxazolo (TMP-SMX)", matrixKey: "TRIMETHOPRIM / SULFAMETHOXAZOLE", commercial: "Bactrim", category: "Sulfamidico + Diaminopirimidina", ph: "alkaline", isVasoactive: false, isSedation: false, isElectrolyte: false, canBolus: false, requiresCentral: false, dosage: "Secondo peso in 60-90 min", carriers: "Glucosio 5% (volumi ampi)", notes: "Rischio precipitazione a basse diluizioni.", source: "Tabelle Validate Y-Site" },
+      { id: 82, name: "Urapidil", matrixKey: "URAPIDIL", commercial: "Ebrantil, Urapidil", category: "Antipertensivo", ph: "acid", isVasoactive: true, isSedation: false, isElectrolyte: false, canBolus: true, requiresCentral: false, dosage: "Boli 10-50mg o continuo 5-40 mg/h", carriers: "Glucosio 5%, NaCl 0.9%", notes: "Non miscelare con alcalini.", source: "Tabelle Validate Y-Site" },
+      { id: 83, name: "Vancomicina", matrixKey: "VANCOMYCIN", commercial: "Vancocin, Maxivan", category: "Glicopeptide", ph: "acid", isVasoactive: false, isSedation: false, isElectrolyte: false, canBolus: false, requiresCentral: false, dosage: "Continuo 20-30 mg/kg/24h", carriers: "NaCl 0.9%, Glucosio 5%", notes: "pH acido (2.5-4.5). Incompatibile con eparina e Tazocin.", source: "Tabelle Validate Y-Site" },
+      { id: 84, name: "Ringerfundin", matrixKey: "RINGERFUNDIN", commercial: "Ringerfundin", category: "Soluzione bilanciata", ph: "carrier", isVasoactive: false, isSedation: false, isElectrolyte: false, canBolus: true, requiresCentral: false, dosage: "Reidratazione / Carrier", carriers: "Pronto all'uso", notes: "Contiene 2.5 mmol/L di Calcio.", source: "Tabelle Validate Y-Site" },
+      { id: 85, name: "Ringer Acetato", matrixKey: "RINGER ACETAT", commercial: "Ringer-Acetat", category: "Soluzione bilanciata", ph: "carrier", isVasoactive: false, isSedation: false, isElectrolyte: false, canBolus: true, requiresCentral: false, dosage: "Reidratazione / Carrier", carriers: "Pronto all'uso", notes: "Contiene Calcio.", source: "Tabelle Validate Y-Site" },
+      { id: 86, name: "Nutrizione parenterale (con lipidi)", matrixKey: "OMEGAFLEX PERI / SPECIAL", commercial: "Omegaflex, Olimel, SmofKabiven", category: "NPT 3-in-1", ph: "npt", isVasoactive: false, isSedation: false, isElectrolyte: false, canBolus: false, requiresCentral: true, dosage: "Target calorico giornaliero", carriers: "Sacca pronta 3-in-1", notes: "LUME DEDICATO ESCLUSIVO OBBLIGATORIO.", source: "Tabelle Validate Y-Site" },
+      { id: 87, name: "Nutrizione parenterale SENZA LIPIDI", matrixKey: "Nutrizione parenterale SENZA LIPIDI*", commercial: "Nutriflex Basale, Sacca 2-in-1", category: "NPT 2-in-1", ph: "npt", isVasoactive: false, isSedation: false, isElectrolyte: false, canBolus: false, requiresCentral: true, dosage: "Target azotato/glucosato", carriers: "Soluzione binaria", notes: "LUME DEDICATO ESCLUSIVO.", source: "Tabelle Validate Y-Site" }
     ];
 
-    // Risolutore Chimico-Fisico Validato
+    // 4. Risolutore Ibrido: Regole Cliniche (Priorità 1) + Database Ufficiale (Priorità 2)
     function evaluateCompatibility(dA, dB) {
-      if (dA.id === dB.id) return { status: 1, notes: "Stesso principio attivo.", source: "Identità" };
+      if (dA.id === dB.id) return { status: 1, notes: "Stesso principio attivo.", source: "Identità Clinica" };
 
-      // Regola 1: NPT Esclusiva (con o senza lipidi)
+      // PRIORITÀ 1: Regole di Sicurezza Clinica Assoluta
       if (dA.ph === "npt" || dB.ph === "npt") {
-        return { status: 2, notes: "INCOMPATIBILE: La NPT richiede rigorosamente un lume dedicato ed esclusivo (Linee guida internazionali).", source: "Linee Guida Nutrizione Clinica" };
+        return { status: 2, notes: "INCOMPATIBILE: La NPT richiede rigorosamente un lume dedicato ed esclusivo.", source: "Regola Clinica Assoluta" };
       }
 
-      // Regola 2: Ceftriaxone vs Calcio
       if ((dA.id === 17 && (dB.id === 10 || dB.id === 91 || dB.ph === "calcium" || dB.id === 84 || dB.id === 85)) || 
           (dB.id === 17 && (dA.id === 10 || dA.id === 91 || dA.ph === "calcium" || dA.id === 84 || dA.id === 85))) {
-        return { status: 2, notes: "CONTROINDICAZIONE ASSOLUTA: Rischio precipitazione letale di Ceftriaxone-Calcio.", source: "Alert Farmacovigilanza Internazionale" };
+        return { status: 2, notes: "CONTROINDICAZIONE ASSOLUTA: Rischio precipitazione letale Ceftriaxone-Calcio.", source: "Alert Farmacovigilanza" };
       }
 
-      // Regola 3: Fenitoina vs qualsiasi farmaco
       if (dA.id === 70 || dB.id === 70) {
-        return { status: 2, notes: "INCOMPATIBILE: La Fenitoina ha pH fortemente alcalino (~12) e precipita istantaneamente a contatto con qualsiasi altra soluzione.", source: "Dati Chimico-Fisici" };
+        return { status: 2, notes: "INCOMPATIBILE: La Fenitoina (pH ~12) precipita a contatto con qualsiasi altra soluzione.", source: "Regola Chimico-Fisica" };
       }
 
-      // Regola 4: Eparina vs Aminoglicosidi / Vancomicina
-      if ((dA.id === 38 && (dB.ph === "aminoglycoside" || dB.id === 83)) || (dB.id === 38 && (dA.ph === "aminoglycoside" || dA.id === 83))) {
-        return { status: 2, notes: "INCOMPATIBILE: Precipitazione fisica immediata e inattivazione con Eparina.", source: "Tabelle di Compatibilità Y-Site" };
+      // PRIORITÀ 2: Interrogazione Database Ufficiale
+      const keyA = dA.matrixKey || dA.name.toUpperCase().trim();
+      const keyB = dB.matrixKey || dB.name.toUpperCase().trim();
+
+      const pair1 = `${keyA}---${keyB}`;
+      const pair2 = `${keyB}---${keyA}`;
+
+      const res = officialCompatibilityMatrix[pair1] || officialCompatibilityMatrix[pair2];
+
+      if (res === 'C') {
+        return { status: 1, notes: "Compatibile in Y-site secondo dati di stabilità tabellati.", source: "Matrice Ufficiale" };
+      } else if (res === 'I') {
+        return { status: 2, notes: "Incompatibile documentato in Y-site.", source: "Matrice Ufficiale" };
       }
 
-      // Regola 5: Beta-lattamici vs Aminoglicosidi
-      if ((dA.ph === "betalactam" && dB.ph === "aminoglycoside") || (dA.ph === "aminoglycoside" && dB.ph === "betalactam")) {
-        return { status: 2, notes: "INCOMPATIBILITÀ CHIMICA: Inattivazione reciproca per reazione covalente.", source: "Dati Farmacocinetici" };
-      }
-
-      // Regola 6: Piperacillina/Tazobactam vs Vancomicina
-      if ((dA.id === 71 && dB.id === 83) || (dA.id === 83 && dB.id === 71)) {
-        return { status: 2, notes: "INCOMPATIBILE: Precipitazione fisica e sub-visibile documentata in Y-site.", source: "Tabelle di Compatibilità Y-Site" };
-      }
-
-      // Regola 7: Bicarbonato di Sodio vs Calcio / Magnesio / Amine
-      if ((dA.id === 77 && (dB.ph === "calcium" || dB.id === 50 || dB.isVasoactive)) || 
-          (dB.id === 77 && (dA.ph === "calcium" || dA.id === 50 || dA.isVasoactive))) {
-        return { status: 2, notes: "INCOMPATIBILE: Precipitazione di Carbonato insolubile o degradazione delle catecolamine.", source: "Dati Chimico-Fisici" };
-      }
-
-      // Regola 8: Furosemide vs Farmaci Acidi (Amine, Oppioidi, Midazolam)
-      if ((dA.id === 36 && (dB.isVasoactive || dB.ph === "acid" || dB.id === 57 || dB.id === 59 || dB.id === 75)) || 
-          (dB.id === 36 && (dA.isVasoactive || dA.ph === "acid" || dA.id === 57 || dA.id === 59 || dA.id === 75))) {
-        return { status: 2, notes: "INCOMPATIBILE: Salto critico di pH (Furosemide pH 9 vs soluzioni acide) con immediata precipitazione microcristallina.", source: "Dati Chimico-Fisici" };
-      }
-
-      // Regola 9: Elettroliti e Mantenimento (KCl + MgSO4 + Eparina + Furosemide + PPI + Paracetamolo + Meropenem)
-      const electroCluster = [72, 50, 38, 36, 31, 68, 69, 51, 56, 88, 89, 90];
-      if (electroCluster.includes(dA.id) && electroCluster.includes(dB.id)) {
-        return { status: 1, notes: "Compatibile in Y-site (Elettroliti e terapie stabili).", source: "Tabelle di Compatibilità Y-Site" };
-      }
-
-      // Regola 10: Vasoattivi tra loro
+      // PRIORITÀ 3: Cluster Logici di Fallback
       if (dA.isVasoactive && dB.isVasoactive) {
-        return { status: 1, notes: "Compatibile in Y-site per linea vasoattiva continua.", source: "Tabelle di Compatibilità Y-Site" };
+        return { status: 1, notes: "Compatibile per linea vasoattiva continua.", source: "Protocollo ICU" };
       }
-
-      // Regola 11: Vasoattivi con Eparina
       if ((dA.isVasoactive && dB.id === 38) || (dB.isVasoactive && dA.id === 38)) {
-        return { status: 1, notes: "Compatibile in Y-site (Eparina co-infusa su linea amine).", source: "Tabelle di Compatibilità Y-Site" };
+        return { status: 1, notes: "Compatibile per co-infusione con Eparina su linea amine.", source: "Protocollo ICU" };
       }
-
-      // Regola 12: Sedativi & Oppioidi tra loro
       if (dA.isSedation && dB.isSedation) {
-        return { status: 1, notes: "Compatibile in Y-site per analgo-sedazione continua.", source: "Tabelle di Compatibilità Y-Site" };
+        return { status: 1, notes: "Compatibile per linea sedazione & analgesia.", source: "Protocollo ICU" };
       }
 
-      // Regola 13: Paracetamolo (69) - Ampia Compatibilità
-      if (dA.id === 69 || dB.id === 69) {
-        const other = dA.id === 69 ? dB : dA;
-        if (![70, 86, 87].includes(other.id)) {
-          return { status: 1, notes: "Compatibile in Y-site (soluzione isotonica neutra).", source: "Tabelle di Compatibilità Y-Site" };
-        }
-      }
-
-      // Regola 14: Metronidazolo (56) - Ampia Compatibilità
-      if (dA.id === 56 || dB.id === 56) {
-        const other = dA.id === 56 ? dB : dA;
-        if (![70, 86, 87].includes(other.id) && (other.isVasoactive || other.isSedation || other.ph === "betalactam" || other.ph === "aminoglycoside" || other.id === 38 || other.id === 72)) {
-          return { status: 1, notes: "Compatibile in Y-site.", source: "Tabelle di Compatibilità Y-Site" };
-        }
-      }
-
-      // Default Cautelativo
       return { status: 0, notes: "⚠️ DATO NON PRESENTE: Nessun test documentato. Somministrare su linea separata.", source: "Principio di Massima Cautela" };
     }
 
@@ -747,7 +708,6 @@
     let matrixSelected = [];
     let activePickerContext = "planner";
 
-    // Navigazione
     function switchView(viewName) {
       currentMode = viewName;
       document.getElementById("viewHome").style.display = viewName === "home" ? "block" : "none";
@@ -789,7 +749,6 @@
       if (plannerSelected.length > 0) calculateAndRenderPlan();
     }
 
-    // ALGORITMO OTTIMIZZATO: Eparina aggregata prioritariamente con le Amine
     function calculateAndRenderPlan() {
       const container = document.getElementById("plannerResultsContainer");
       if (plannerSelected.length === 0) {
@@ -801,21 +760,19 @@
       let groups = [];
       let unassigned = [...plannerSelected];
 
-      // 1. PRIORITÀ ASSOLUTA: NPT su Lume Dedicato Esclusivo (max 1 farmaco)
+      // 1. NPT Lume Dedicato
       const npt = unassigned.find(d => d.ph === "npt");
       if (npt) {
         groups.push({ type: "npt", name: "Nutrizione Parenterale (NPT)", drugs: [npt] });
         unassigned = unassigned.filter(d => d.id !== npt.id);
       }
 
-      // 2. PRIORITÀ VASOATTIVI: Raggruppa le catecolamine + EPARINA SODICA (ID 38)
+      // 2. Vasoattivi + Eparina
       const vasoactives = unassigned.filter(d => d.isVasoactive);
       const heparin = unassigned.find(d => d.id === 38 || d.name.toLowerCase().includes("eparina"));
 
       if (vasoactives.length > 0) {
         let vasoGroup = [];
-        
-        // Inserisce prima le catecolamine e i vasoattivi compatibili
         vasoactives.forEach(vd => {
           if (vasoGroup.length < MAX_DRUGS_PER_LUMEN) {
             let canFit = vasoGroup.every(ex => evaluateCompatibility(vd, ex).status === 1);
@@ -826,7 +783,6 @@
           }
         });
 
-        // Se c'è spazio e l'Eparina è presente ed è compatibile, la inserisce direttamente nel Lume Amine
         if (heparin && vasoGroup.length < MAX_DRUGS_PER_LUMEN) {
           let canFitHeparin = vasoGroup.every(ex => evaluateCompatibility(heparin, ex).status === 1);
           if (canFitHeparin) {
@@ -840,7 +796,7 @@
         }
       }
 
-      // 3. PRIORITÀ SEDAZIONE: Raggruppa Sedativi, Oppioidi e Curari
+      // 3. Sedazione & Analgesia
       const sedatives = unassigned.filter(d => d.isSedation);
       if (sedatives.length > 0) {
         let sedGroup = [];
@@ -858,7 +814,7 @@
         }
       }
 
-      // 4. PRIORITÀ ELETTROLITI & MANTENIMENTO: Solo se ci sono veri elettroliti (KCl, MgSO4)
+      // 4. Elettroliti
       const trueElectrolytes = unassigned.filter(d => d.isElectrolyte);
       if (trueElectrolytes.length > 0) {
         let elGroup = [];
@@ -876,15 +832,13 @@
         }
       }
 
-      // 5. SMISTAMENTO FARMACI RESTANTI (Antibiotici, PPI, Paracetamolo, ecc.)
+      // 5. Restanti
       unassigned.forEach(drug => {
         let placed = false;
-        
-        // Tentativo A: Compattazione nei lumi già esistenti compatibili (esclusi NPT e Vasoattivi puri)
         for (let group of groups) {
           if (group.type === "npt") continue;
-          if (group.type === "vasoactive") continue; // Non aggiungere antibiotici/farmaci standard sulle amine
-          if (group.type === "sedation" && !drug.isSedation) continue; // Non inquinare la linea sedativa
+          if (group.type === "vasoactive") continue;
+          if (group.type === "sedation" && !drug.isSedation) continue;
           if (group.drugs.length >= MAX_DRUGS_PER_LUMEN) continue;
 
           let isCompatible = group.drugs.every(gDrug => evaluateCompatibility(drug, gDrug).status === 1);
@@ -895,7 +849,6 @@
           }
         }
 
-        // Tentativo B: Apertura nuovo lume CVC se ancora disponibili fisicamente
         if (!placed && groups.length < selectedLumens) {
           let gType = drug.isVasoactive ? "vasoactive" : (drug.isSedation ? "sedation" : (drug.isElectrolyte ? "electrolyte" : "standard"));
           let gName = drug.isVasoactive ? "Linea Vasoattivi Continui" : (drug.isSedation ? "Linea Sedazione" : (drug.isElectrolyte ? "Linea Elettroliti" : "Linea Terapia Standard"));
@@ -903,7 +856,6 @@
           placed = true;
         }
 
-        // Tentativo C: Accodamento a vie aggiuntive se superato il numero di lumi
         if (!placed) {
           let existingExceeded = groups.find((g, i) => i >= selectedLumens && g.drugs.length < MAX_DRUGS_PER_LUMEN && g.drugs.every(ex => evaluateCompatibility(drug, ex).status === 1));
           if (existingExceeded) {
@@ -914,7 +866,6 @@
         }
       });
 
-      // Generazione Rendering Grafico
       let html = "";
       const totalGroups = groups.length;
       const lumenNames = ["Lume 1 (Distale)", "Lume 2 (Mediale)", "Lume 3 (Prossimale)", "Lume 4 (Addizionale)"];
@@ -1043,7 +994,6 @@
       container.innerHTML = html;
     }
 
-    // Modalità Matrice Incrociata (Classica)
     function renderMatrixSelection() {
       const container = document.getElementById("matrixChipsContainer");
       const counter = document.getElementById("matrixCounter");
@@ -1104,7 +1054,6 @@
       container.innerHTML = html;
     }
 
-    // Gestione Selezione Farmaci Planner
     function renderPlannerSelection() {
       const container = document.getElementById("plannerChipsContainer");
       const counter = document.getElementById("plannerCounter");
@@ -1145,7 +1094,6 @@
       }
     }
 
-    // Modali & Ricerca con Ordinamento Alfabetico (A-Z)
     function openPicker(context) {
       activePickerContext = context;
       document.getElementById("searchDrugInput").value = "";
@@ -1160,7 +1108,6 @@
 
       const currentList = activePickerContext === "planner" ? plannerSelected : matrixSelected;
 
-      // Filtraggio e Ordinamento Alfabetico A-Z
       const filtered = drugsDB
         .filter(d => 
           d.name.toLowerCase().includes(query) || 
@@ -1209,13 +1156,13 @@
     function closeModalOnBg(e, id) { if (e.target.id === id) closeModal(id); }
   </script>
 
-  <!-- Registrazione Service Worker per PWA Offline -->
+  <!-- Registrazione Service Worker PWA -->
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
         navigator.serviceWorker.register('./service-worker.js')
-          .then(reg => console.log('PWA Service Worker registrato con successo:', reg.scope))
-          .catch(err => console.log('Errore registrazione Service Worker:', err));
+          .then(reg => console.log('PWA Service Worker registrato:', reg.scope))
+          .catch(err => console.log('Errore Service Worker:', err));
       });
     }
   </script>
